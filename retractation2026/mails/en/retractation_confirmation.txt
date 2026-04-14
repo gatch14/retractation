@@ -1,0 +1,24 @@
+Withdrawal Confirmation
+========================
+
+Dear {firstname} {lastname},
+
+We acknowledge receipt of your withdrawal request. Please find below a summary of your declaration.
+
+Withdrawal Details
+------------------
+Order reference:  {order_reference}
+Withdrawal date:  {retractation_date}
+Withdrawal time:  {retractation_time}
+Reason:           {reason}
+
+In accordance with Articles L221-18 et seq. of the French Consumer Code, you have a 14-day right of withdrawal from the date of receipt of your order.
+
+This email serves as a durable medium within the meaning of Article L221-1 of the French Consumer Code, confirming receipt of your withdrawal declaration.
+
+Kind regards,
+{shop_name}
+
+--
+This message was sent automatically by {shop_name} ({shop_url}).
+This email serves as a durable medium in accordance with French consumer law.

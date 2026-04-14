@@ -1,0 +1,19 @@
+CREATE TABLE IF NOT EXISTS `PREFIX_retractation` (
+    `id_retractation` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id_order` INT UNSIGNED NOT NULL,
+    `id_customer` INT UNSIGNED NOT NULL,
+    `id_shop` INT UNSIGNED NOT NULL DEFAULT 1,
+    `reason` TEXT,
+    `status` VARCHAR(32) NOT NULL DEFAULT 'pending',
+    `retractation_date` DATETIME NOT NULL,
+    `deadline_date` DATETIME NOT NULL,
+    `deadline_source` VARCHAR(32) NOT NULL DEFAULT 'order',
+    `ip_address` VARCHAR(45) DEFAULT NULL,
+    `date_add` DATETIME NOT NULL,
+    `date_upd` DATETIME NOT NULL,
+    PRIMARY KEY (`id_retractation`),
+    KEY `idx_order` (`id_order`),
+    KEY `idx_customer` (`id_customer`),
+    KEY `idx_shop` (`id_shop`),
+    KEY `idx_status` (`status`)
+) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8mb4;

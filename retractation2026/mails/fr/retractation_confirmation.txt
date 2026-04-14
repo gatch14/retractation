@@ -1,0 +1,24 @@
+Confirmation de rétractation
+=============================
+
+Bonjour {firstname} {lastname},
+
+Nous accusons bonne réception de votre demande de rétractation. Vous trouverez ci-dessous le récapitulatif de votre déclaration.
+
+Détails de la rétractation
+--------------------------
+Référence de commande : {order_reference}
+Date de rétractation :  {retractation_date}
+Heure de rétractation : {retractation_time}
+Motif :                 {reason}
+
+Conformément aux articles L221-18 et suivants du Code de la consommation, vous disposez d'un droit de rétractation de 14 jours à compter de la réception de votre commande.
+
+Cet email constitue un support durable au sens de l'article L221-1 du Code de la consommation, confirmant la réception de votre déclaration de rétractation.
+
+Cordialement,
+{shop_name}
+
+--
+Ce message a été envoyé automatiquement par {shop_name} ({shop_url}).
+Cet email fait office de support durable conformément au droit de la consommation français.

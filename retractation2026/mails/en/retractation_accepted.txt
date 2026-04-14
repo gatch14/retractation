@@ -1,0 +1,16 @@
+Hello {firstname} {lastname},
+
+We confirm that your retractation request has been accepted.
+
+Order reference: {order_reference}
+Request date: {retractation_date}
+
+In accordance with Article L221-24 of the French Consumer Code, we will refund the full amount paid, including delivery costs, within a maximum of 14 days from the date of your retractation request.
+
+The refund will be made using the same payment method used for the initial transaction, unless you expressly agree to a different method.
+
+Best regards,
+{shop_name}
+
+---
+This message was sent automatically by {shop_name} ({shop_url}).

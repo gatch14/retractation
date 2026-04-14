@@ -1,0 +1,20 @@
+Bonjour {firstname} {lastname},
+
+Après examen de votre demande, nous ne sommes malheureusement pas en mesure d'accepter votre rétractation.
+
+Référence de commande : {order_reference}
+Date de la demande : {retractation_date}
+Motif du refus : {reject_reason}
+
+Les motifs de refus les plus courants sont :
+- Dépassement du délai légal de 14 jours
+- Produit relevant d'une exception légale (article L221-28 du Code de la consommation)
+- Produit descellé ne pouvant être renvoyé pour des raisons d'hygiène ou de protection de la santé
+
+Si vous estimez que cette décision est erronée, vous pouvez contacter notre service client ou saisir le médiateur de la consommation.
+
+Cordialement,
+{shop_name}
+
+---
+Ce message a été envoyé automatiquement par {shop_name} ({shop_url}).

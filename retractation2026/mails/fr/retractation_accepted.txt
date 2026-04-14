@@ -1,0 +1,17 @@
+Bonjour {firstname} {lastname},
+
+Nous vous confirmons que votre demande de rétractation a été acceptée.
+
+Référence de commande : {order_reference}
+Date de la demande : {retractation_date}
+
+Conformément à l'article L221-24 du Code de la consommation, nous procéderons au remboursement de la totalité des sommes versées, y compris les frais de livraison, dans un délai maximum de 14 jours à compter de la date de votre demande de rétractation.
+
+Le remboursement sera effectué en utilisant le même moyen de paiement que celui utilisé pour la transaction initiale, sauf si vous convenez expressément d'un moyen différent.
+
+Cordialement,
+{shop_name}
+
+---
+Ce message a été envoyé automatiquement par {shop_name} ({shop_url}).
+Cet email fait office de support durable conformément au droit de la consommation français.

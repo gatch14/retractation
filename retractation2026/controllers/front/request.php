@@ -211,6 +211,15 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         if (Tools::isSubmit('submitLookup')) {
             $order = $this->lookupOrderByReference();
             if ($order) {
+                if ($this->context->customer->isLogged()
+                    && (int) $order->id_customer !== (int) $this->context->customer->id
+                ) {
+                    $this->errors[] = $this->trans('This order does not belong to your account.', [], 'Modules.Retractation2026.Front');
+                    $this->context->smarty->assign(['show_lookup' => true]);
+                    $this->setTemplate('module:retractation2026/views/templates/front/request.tpl');
+                    return;
+                }
+
                 $customer = new Customer((int) $order->id_customer);
                 $guestEmail = pSQL(trim(Tools::getValue('lookup_email')));
 

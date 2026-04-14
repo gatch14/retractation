@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en-US" target-language="fr-FR" datatype="plaintext" original="Modules.Retractation2026.Front">
+    <body>
+      <trans-unit id="f47ac10b58cc4372a5670e02b2c3d479" resname="My retractation requests">
+        <source>My retractation requests</source>
+        <target>Mes demandes de rétractation</target>
+      </trans-unit>
+      <trans-unit id="a1b2c3d4e5f647ac" resname="Order Reference">
+        <source>Order Reference</source>
+        <target>Référence de commande</target>
+      </trans-unit>
+      <trans-unit id="b2c3d4e5f647ac10" resname="Status">
+        <source>Status</source>
+        <target>Statut</target>
+      </trans-unit>
+      <trans-unit id="c3d4e5f647ac10b5" resname="Retractation Date">
+        <source>Retractation Date</source>
+        <target>Date de rétractation</target>
+      </trans-unit>
+      <trans-unit id="d4e5f647ac10b58c" resname="Deadline Date">
+        <source>Deadline Date</source>
+        <target>Date limite</target>
+      </trans-unit>
+      <trans-unit id="e5f647ac10b58cc4" resname="Pending">
+        <source>Pending</source>
+        <target>En attente</target>
+      </trans-unit>
+      <trans-unit id="f647ac10b58cc437" resname="Accepted">
+        <source>Accepted</source>
+        <target>Acceptée</target>
+      </trans-unit>
+      <trans-unit id="647ac10b58cc4372" resname="Rejected">
+        <source>Rejected</source>
+        <target>Refusée</target>
+      </trans-unit>
+      <trans-unit id="47ac10b58cc43725" resname="Cancelled">
+        <source>Cancelled</source>
+        <target>Annulée</target>
+      </trans-unit>
+      <trans-unit id="7ac10b58cc437256" resname="You have no retractation requests.">
+        <source>You have no retractation requests.</source>
+        <target>Vous n'avez aucune demande de rétractation.</target>
+      </trans-unit>
+      <trans-unit id="ac10b58cc4372567" resname="Back to my account">
+        <source>Back to my account</source>
+        <target>Retour à mon compte</target>
+      </trans-unit>
+      <trans-unit id="c10b58cc43725670" resname="Confirmation de rétractation">
+        <source>Confirmation de rétractation</source>
+        <target>Confirmation de rétractation</target>
+      </trans-unit>
+      <trans-unit id="10b58cc437256700" resname="Votre demande de rétractation a été enregistrée avec succès.">
+        <source>Votre demande de rétractation a été enregistrée avec succès.</source>
+        <target>Votre demande de rétractation a été enregistrée avec succès.</target>
+      </trans-unit>
+      <trans-unit id="0b58cc4372567001" resname="Référence de commande :">
+        <source>Référence de commande :</source>
+        <target>Référence de commande :</target>
+      </trans-unit>
+      <trans-unit id="b58cc43725670012" resname="Date de rétractation :">
+        <source>Date de rétractation :</source>
+        <target>Date de rétractation :</target>
+      </trans-unit>
+      <trans-unit id="58cc437256700123" resname="Heure de rétractation :">
+        <source>Heure de rétractation :</source>
+        <target>Heure de rétractation :</target>
+      </trans-unit>
+      <trans-unit id="8cc4372567001234" resname="Un email de confirmation vous sera envoyé.">
+        <source>Un email de confirmation vous sera envoyé.</source>
+        <target>Un email de confirmation vous sera envoyé.</target>
+      </trans-unit>
+      <trans-unit id="cc43725670012345" resname="Retour au suivi de commande">
+        <source>Retour au suivi de commande</source>
+        <target>Retour au suivi de commande</target>
+      </trans-unit>
+      <trans-unit id="c437256700123456" resname="Retour à mes commandes">
+        <source>Retour à mes commandes</source>
+        <target>Retour à mes commandes</target>
+      </trans-unit>
+      <trans-unit id="4372567001234567" resname="Exercer mon droit de rétractation">
+        <source>Exercer mon droit de rétractation</source>
+        <target>Exercer mon droit de rétractation</target>
+      </trans-unit>
+      <trans-unit id="3725670012345678" resname="In accordance with applicable consumer protection law, you have a right of withdrawal that you may exercise within the legal deadline after receiving your order.">
+        <source>In accordance with applicable consumer protection law, you have a right of withdrawal that you may exercise within the legal deadline after receiving your order.</source>
+        <target>Conformément au droit de la consommation applicable, vous disposez d'un droit de rétractation que vous pouvez exercer dans le délai légal suivant la réception de votre commande.</target>
+      </trans-unit>
+      <trans-unit id="7256700123456789" resname="You can submit your withdrawal request from the &quot;My retractations&quot; section of your customer account.">
+        <source>You can submit your withdrawal request from the "My retractations" section of your customer account.</source>
+        <target>Vous pouvez soumettre votre demande de rétractation depuis la rubrique « Mes rétractations » de votre espace client.</target>
+      </trans-unit>
+      <trans-unit id="256700123456789a" resname="You can submit your withdrawal request from our online withdrawal form.">
+        <source>You can submit your withdrawal request from our online withdrawal form.</source>
+        <target>Vous pouvez soumettre votre demande de rétractation depuis notre formulaire de rétractation en ligne.</target>
+      </trans-unit>
+      <trans-unit id="56700123456789ab" resname="Vous pouvez exercer votre droit de rétractation jusqu'au">
+        <source>Vous pouvez exercer votre droit de rétractation jusqu'au</source>
+        <target>Vous pouvez exercer votre droit de rétractation jusqu'au</target>
+      </trans-unit>
+      <trans-unit id="6700123456789abc" resname="Renoncer au contrat ici">
+        <source>Renoncer au contrat ici</source>
+        <target>Renoncer au contrat ici</target>
+      </trans-unit>
+      <trans-unit id="700123456789abcd" resname="Demande de rétractation">
+        <source>Demande de rétractation</source>
+        <target>Demande de rétractation</target>
+      </trans-unit>
+      <trans-unit id="00123456789abcde" resname="Pour exercer votre droit de rétractation, veuillez renseigner votre adresse email et la référence de votre commande.">
+        <source>Pour exercer votre droit de rétractation, veuillez renseigner votre adresse email et la référence de votre commande.</source>
+        <target>Pour exercer votre droit de rétractation, veuillez renseigner votre adresse email et la référence de votre commande.</target>
+      </trans-unit>
+      <trans-unit id="0123456789abcdef" resname="Adresse email">
+        <source>Adresse email</source>
+        <target>Adresse email</target>
+      </trans-unit>
+      <trans-unit id="123456789abcdef0" resname="Email utilisé lors de la commande">
+        <source>Email utilisé lors de la commande</source>
+        <target>Email utilisé lors de la commande</target>
+      </trans-unit>
+      <trans-unit id="23456789abcdef01" resname="Référence de commande">
+        <source>Référence de commande</source>
+        <target>Référence de commande</target>
+      </trans-unit>
+      <trans-unit id="3456789abcdef012" resname="Ex: ABCDEFGH">
+        <source>Ex: ABCDEFGH</source>
+        <target>Ex : ABCDEFGH</target>
+      </trans-unit>
+      <trans-unit id="456789abcdef0123" resname="Rechercher ma commande">
+        <source>Rechercher ma commande</source>
+        <target>Rechercher ma commande</target>
+      </trans-unit>
+      <trans-unit id="56789abcdef01234" resname="Date limite de rétractation :">
+        <source>Date limite de rétractation :</source>
+        <target>Date limite de rétractation :</target>
+      </trans-unit>
+      <trans-unit id="6789abcdef012345" resname="Prénom">
+        <source>Prénom</source>
+        <target>Prénom</target>
+      </trans-unit>
+      <trans-unit id="789abcdef0123456" resname="Nom">
+        <source>Nom</source>
+        <target>Nom</target>
+      </trans-unit>
+      <trans-unit id="89abcdef01234567" resname="Email">
+        <source>Email</source>
+        <target>Email</target>
+      </trans-unit>
+      <trans-unit id="9abcdef012345678" resname="Motif (facultatif)">
+        <source>Motif (facultatif)</source>
+        <target>Motif (facultatif)</target>
+      </trans-unit>
+      <trans-unit id="abcdef0123456789" resname="Indiquez le motif de votre rétractation si vous le souhaitez">
+        <source>Indiquez le motif de votre rétractation si vous le souhaitez</source>
+        <target>Indiquez le motif de votre rétractation si vous le souhaitez</target>
+      </trans-unit>
+      <trans-unit id="bcdef0123456789a" resname="Confirmer la rétractation">
+        <source>Confirmer la rétractation</source>
+        <target>Confirmer la rétractation</target>
+      </trans-unit>
+      <trans-unit id="cdef0123456789ab" resname="This product is eligible for the legal right of withdrawal.">
+        <source>This product is eligible for the legal right of withdrawal.</source>
+        <target>Ce produit est éligible au droit légal de rétractation.</target>
+      </trans-unit>
+      <trans-unit id="def0123456789abc" resname="You may return it within the statutory deadline after delivery.">
+        <source>You may return it within the statutory deadline after delivery.</source>
+        <target>Vous pouvez le retourner dans le délai légal suivant la livraison.</target>
+      </trans-unit>
+      <trans-unit id="ef0123456789abcd" resname="Legal information">
+        <source>Legal information</source>
+        <target>Informations légales</target>
+      </trans-unit>
+      <trans-unit id="f0123456789abcde" resname="Right of withdrawal">
+        <source>Right of withdrawal</source>
+        <target>Droit de rétractation</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

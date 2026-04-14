@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retractation accepted</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, Helvetica, sans-serif; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { background-color: #27ae60; color: #ffffff; padding: 20px 30px; text-align: center; }
+    .header h1 { margin: 0; font-size: 22px; }
+    .content { padding: 30px; color: #333333; line-height: 1.6; }
+    .content h2 { color: #27ae60; font-size: 18px; margin-top: 0; }
+    .details { background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px; margin: 20px 0; }
+    .details table { width: 100%; border-collapse: collapse; }
+    .details td { padding: 8px 0; vertical-align: top; }
+    .details td.label { font-weight: bold; width: 200px; color: #555555; }
+    .footer { background-color: #f4f4f4; padding: 20px 30px; font-size: 12px; color: #888888; text-align: center; border-top: 1px solid #e0e0e0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Retractation accepted</h1>
+    </div>
+    <div class="content">
+      <p>Hello {firstname} {lastname},</p>
+
+      <p>We confirm that your retractation request has been <strong>accepted</strong>.</p>
+
+      <div class="details">
+        <h2>Details</h2>
+        <table>
+          <tr>
+            <td class="label">Order reference:</td>
+            <td>{order_reference}</td>
+          </tr>
+          <tr>
+            <td class="label">Request date:</td>
+            <td>{retractation_date}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p>In accordance with Article L221-24 of the French Consumer Code, we will refund the full amount paid, including delivery costs, within a maximum of <strong>14 days</strong> from the date of your retractation request.</p>
+
+      <p>The refund will be made using the same payment method used for the initial transaction, unless you expressly agree to a different method.</p>
+
+      <p>Best regards,<br>{shop_name}</p>
+    </div>
+    <div class="footer">
+      <p>This message was sent automatically by <a href="{shop_url}">{shop_name}</a>.</p>
+    </div>
+  </div>
+</body>
+</html>

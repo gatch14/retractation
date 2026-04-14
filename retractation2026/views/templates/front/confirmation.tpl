@@ -20,8 +20,14 @@
       {l s='Un email de confirmation vous sera envoyé.' d='Modules.Retractation2026.Front'}
     </p>
 
-    <a href="{$link->getPageLink('history')}" class="btn btn-primary">
-      {l s='Retour à mes commandes' d='Modules.Retractation2026.Front'}
-    </a>
+    {if $is_guest}
+      <a href="{$link->getPageLink('guest-tracking')}" class="btn btn-primary">
+        {l s='Retour au suivi de commande' d='Modules.Retractation2026.Front'}
+      </a>
+    {else}
+      <a href="{$link->getPageLink('history')}" class="btn btn-primary">
+        {l s='Retour à mes commandes' d='Modules.Retractation2026.Front'}
+      </a>
+    {/if}
   </div>
 {/block}

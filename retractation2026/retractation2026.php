@@ -35,6 +35,7 @@ class Retractation2026 extends Module
         'displayProductAdditionalInfo',
         'displayShoppingCartFooter',
         'displayHeader',
+        'displayFooter',
     ];
 
     public function __construct()
@@ -95,7 +96,8 @@ class Retractation2026 extends Module
             && $this->registerHook('actionOrderStatusPostUpdate')
             && $this->registerHook('displayProductAdditionalInfo')
             && $this->registerHook('displayShoppingCartFooter')
-            && $this->registerHook('displayHeader');
+            && $this->registerHook('displayHeader')
+            && $this->registerHook('displayFooter');
     }
 
     public function uninstall()
@@ -149,13 +151,23 @@ class Retractation2026 extends Module
             return '';
         }
 
+        $linkParams = ['id_order' => (int) $params['order']->id];
+
+        if (!$this->context->customer->isLogged()) {
+            $customer = new Customer((int) $params['order']->id_customer);
+            if (Validate::isLoadedObject($customer)) {
+                $linkParams['guest_email'] = $customer->email;
+                $linkParams['order_reference'] = $params['order']->reference;
+            }
+        }
+
         $this->context->smarty->assign([
             'retractation_eligible' => true,
             'retractation_deadline' => $result['deadline'],
             'retractation_url' => $this->context->link->getModuleLink(
                 'retractation2026',
                 'request',
-                ['id_order' => (int) $params['order']->id]
+                $linkParams
             ),
         ]);
 
@@ -203,6 +215,20 @@ class Retractation2026 extends Module
     public function hookDisplayShoppingCartFooter(array $params): string
     {
         return $this->display(__FILE__, 'views/templates/hook/displayShoppingCartFooter.tpl');
+    }
+
+    public function hookDisplayFooter(array $params): string
+    {
+        $this->context->smarty->assign([
+            'retractation_link' => $this->context->link->getModuleLink(
+                $this->name,
+                'request',
+                [],
+                true
+            ),
+        ]);
+
+        return $this->display(__FILE__, 'views/templates/hook/displayFooter.tpl');
     }
 
     public function hookDisplayProductAdditionalInfo(array $params): string

@@ -63,8 +63,7 @@ class RetractationEligibilityService
                     ON oh.id_order_state = os.id_order_state
                 WHERE oh.id_order = ' . (int) $idOrder . '
                     AND os.`' . bqSQL($stateColumn) . '` = 1
-                ORDER BY oh.date_add ASC
-                LIMIT 1';
+                ORDER BY oh.date_add ASC';
 
         $result = Db::getInstance()->getValue($sql);
 

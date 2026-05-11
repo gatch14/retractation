@@ -4,6 +4,7 @@ After reviewing your request, we are unfortunately unable to accept your retract
 
 Order reference: {order_reference}
 Request date: {retractation_date}
+Request time: {retractation_time}
 Rejection reason: {reject_reason}
 
 If you believe this decision is incorrect, you may contact our customer service or refer the matter to the consumer mediator.

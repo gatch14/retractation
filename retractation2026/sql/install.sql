@@ -15,5 +15,6 @@ CREATE TABLE IF NOT EXISTS `PREFIX_retractation` (
     KEY `idx_order` (`id_order`),
     KEY `idx_customer` (`id_customer`),
     KEY `idx_shop` (`id_shop`),
-    KEY `idx_status` (`status`)
+    KEY `idx_status` (`status`),
+    UNIQUE KEY `uq_order_active` (`id_order`, `id_shop`)
 ) ENGINE=ENGINE_TYPE DEFAULT CHARSET=utf8mb4;

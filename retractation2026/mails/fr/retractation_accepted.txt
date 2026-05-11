@@ -4,6 +4,7 @@ Nous vous confirmons que votre demande de rétractation a été acceptée.
 
 Référence de commande : {order_reference}
 Date de la demande : {retractation_date}
+Heure de la demande : {retractation_time}
 
 Conformément à l'article L221-24 du Code de la consommation, nous procéderons au remboursement de la totalité des sommes versées, y compris les frais de livraison, dans un délai maximum de 14 jours à compter de la date de votre demande de rétractation.
 

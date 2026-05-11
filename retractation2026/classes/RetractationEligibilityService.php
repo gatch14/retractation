@@ -36,6 +36,15 @@ class RetractationEligibilityService
             return $this->ineligible('Order is cancelled or refunded');
         }
 
+        // L221-28: virtual/downloadable products are exempt from the right of withdrawal
+        $hasOnlyVirtual = (bool) Db::getInstance()->getValue(
+            'SELECT MIN(od.is_virtual) FROM `' . _DB_PREFIX_ . 'order_detail` od
+             WHERE od.id_order = ' . $idOrder
+        );
+        if ($hasOnlyVirtual) {
+            return $this->ineligible('Order contains only virtual/downloadable products (L221-28)');
+        }
+
         $delayDays = (int) Configuration::get('RETRACTATION_DELAY_DAYS');
         $bufferShipped = (int) Configuration::get('RETRACTATION_BUFFER_SHIPPED');
         $bufferOrder = (int) Configuration::get('RETRACTATION_BUFFER_ORDER');

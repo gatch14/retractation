@@ -80,7 +80,7 @@
             <div class="form-group row">
               <label class="col-md-4 col-form-label">{l s='Référence de commande' mod='retractation2026'}</label>
               <div class="col-md-8">
-                <input type="text" class="form-control" value="{$order_reference}" readonly />
+                <input type="text" class="form-control" value="{$order_reference|escape:'htmlall':'UTF-8'}" readonly />
               </div>
             </div>
 

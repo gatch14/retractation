@@ -4,6 +4,7 @@ We confirm that your retractation request has been accepted.
 
 Order reference: {order_reference}
 Request date: {retractation_date}
+Request time: {retractation_time}
 
 In accordance with Article L221-24 of the French Consumer Code, we will refund the full amount paid, including delivery costs, within a maximum of 14 days from the date of your retractation request.
 

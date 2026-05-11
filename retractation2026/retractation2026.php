@@ -31,7 +31,6 @@ class Retractation2026 extends Module
         'displayOrderDetail',
         'displayCustomerAccount',
         'displayAdminOrderSide',
-        'actionOrderStatusPostUpdate',
         'displayProductAdditionalInfo',
         'displayShoppingCartFooter',
         'displayHeader',
@@ -95,7 +94,6 @@ class Retractation2026 extends Module
             && $this->registerHook('displayOrderDetail')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('displayAdminOrderSide')
-            && $this->registerHook('actionOrderStatusPostUpdate')
             && $this->registerHook('displayProductAdditionalInfo')
             && $this->registerHook('displayShoppingCartFooter')
             && $this->registerHook('displayHeader');
@@ -224,9 +222,10 @@ class Retractation2026 extends Module
 
     public function uninstall()
     {
-        if (!$this->executeSqlFile('uninstall')) {
-            return false;
-        }
+        // CR-08: archive records instead of dropping (legal evidentiary value)
+        $db = Db::getInstance();
+        $db->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'retractation_archived`');
+        $db->execute('RENAME TABLE `' . _DB_PREFIX_ . 'retractation` TO `' . _DB_PREFIX_ . 'retractation_archived`');
 
         $idTab = (int) Tab::getIdFromClassName('AdminRetractationDashboard');
         if ($idTab) {
@@ -276,14 +275,11 @@ class Retractation2026 extends Module
             return '';
         }
 
-        $linkParams = ['id_order' => (int) $params['order']->id];
-
-        if (!$this->context->customer->isLogged()) {
-            $customer = new Customer((int) $params['order']->id_customer);
-            if (Validate::isLoadedObject($customer)) {
-                $linkParams['guest_email'] = $customer->email;
-                $linkParams['order_reference'] = $params['order']->reference;
-            }
+        // CR-02: guests link to lookup form — email must never appear in GET params
+        if ($this->context->customer->isLogged()) {
+            $linkParams = ['id_order' => (int) $params['order']->id];
+        } else {
+            $linkParams = [];
         }
 
         $this->context->smarty->assign([
@@ -344,6 +340,10 @@ class Retractation2026 extends Module
 
     public function hookDisplayProductAdditionalInfo(array $params): string
     {
+        // IN-03/CR-06: do not show withdrawal notice for virtual/downloadable products (L221-28)
+        if (!empty($params['product']['is_virtual'])) {
+            return '';
+        }
         return $this->display(__FILE__, 'views/templates/hook/displayProductAdditionalInfo.tpl');
     }
 

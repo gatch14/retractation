@@ -17,8 +17,9 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
 
     private function lookupOrderByReference(): ?Order
     {
-        $email = pSQL(trim(Tools::getValue('lookup_email')));
-        $reference = pSQL(trim(Tools::getValue('lookup_reference')));
+        // WR-08: pSQL applied only at interpolation, not pre-stored
+        $email = trim(Tools::getValue('lookup_email'));
+        $reference = trim(Tools::getValue('lookup_reference'));
 
         if (empty($email) || empty($reference)) {
             $this->errors[] = $this->trans('Please provide your email and order reference.', [], 'Modules.Retractation2026.Front');
@@ -67,11 +68,17 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
             return $order;
         }
 
-        $guestEmail = pSQL(Tools::getValue('guest_email'));
-        $orderReference = pSQL(Tools::getValue('order_reference'));
+        // CR-02: validate guest email before comparison
+        $guestEmail = Tools::getValue('guest_email');
+        $orderReference = Tools::getValue('order_reference');
 
         if (empty($guestEmail) || empty($orderReference)) {
             $this->errors[] = $this->trans('Please provide your email and order reference.', [], 'Modules.Retractation2026.Front');
+            return null;
+        }
+
+        if (!Validate::isEmail($guestEmail)) {
+            $this->errors[] = $this->trans('Invalid email address.', [], 'Modules.Retractation2026.Front');
             return null;
         }
 
@@ -102,6 +109,40 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         return (int) Tools::getValue('id_order') > 0;
     }
 
+    // WR-02: single eligibility + duplicate guard used by all code paths
+    private function checkEligibility(Order $order): ?array
+    {
+        require_once _PS_MODULE_DIR_ . 'retractation2026/classes/RetractationEligibilityService.php';
+        $service = new RetractationEligibilityService();
+        $eligibility = $service->getEligibility((int) $order->id);
+
+        if (!$eligibility['eligible']) {
+            $this->errors[] = $this->trans('This order is not eligible for retractation.', [], 'Modules.Retractation2026.Front');
+            return null;
+        }
+
+        $existing = Db::getInstance()->getValue(
+            'SELECT id_retractation FROM `' . _DB_PREFIX_ . 'retractation`
+             WHERE id_order = ' . (int) $order->id . '
+               AND id_shop = ' . (int) $this->context->shop->id . '
+               AND status != \'cancelled\''
+        );
+        if ($existing) {
+            $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Front');
+            return null;
+        }
+
+        return $eligibility;
+    }
+
+    // CR-01: per-form nonce stored in session cookie
+    private function generateFormToken(): string
+    {
+        $token = bin2hex(random_bytes(16));
+        $this->context->cookie->retractation_nonce = $token;
+        return $token;
+    }
+
     public function postProcess()
     {
         if (Tools::isSubmit('submitLookup')) {
@@ -112,42 +153,35 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
             return;
         }
 
-        if (Tools::getValue('retractation_token') !== Tools::getToken(false)) {
+        // CR-01: verify nonce (single-use, consumed on success)
+        $nonce = $this->context->cookie->retractation_nonce;
+        if (!$nonce || Tools::getValue('retractation_token') !== $nonce) {
             $this->errors[] = $this->trans('Invalid security token. Please try again.', [], 'Modules.Retractation2026.Front');
             return;
         }
+        $this->context->cookie->retractation_nonce = false;
 
         $order = $this->loadOrderAndVerifyAccess();
         if (!$order) {
             return;
         }
 
-        require_once _PS_MODULE_DIR_ . 'retractation2026/classes/RetractationEligibilityService.php';
-        $service = new RetractationEligibilityService();
-        $eligibility = $service->getEligibility((int) $order->id);
-
-        if (!$eligibility['eligible']) {
-            $this->errors[] = $this->trans('This order is not eligible for retractation.', [], 'Modules.Retractation2026.Front');
-            return;
-        }
-
-        $existing = Db::getInstance()->getValue(
-            'SELECT id_retractation FROM `' . _DB_PREFIX_ . 'retractation`
-             WHERE id_order = ' . (int) $order->id . ' AND status != \'cancelled\''
-        );
-        if ($existing) {
-            $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Front');
+        $eligibility = $this->checkEligibility($order);
+        if (!$eligibility) {
             return;
         }
 
         $customer = $this->getCustomerForOrder($order);
 
         $now = date('Y-m-d H:i:s');
+        // CR-07: strip HTML tags from reason before storage
+        $reason = strip_tags(Tools::getValue('reason'));
+
         $data = [
             'id_order' => (int) $order->id,
             'id_customer' => (int) $customer->id,
             'id_shop' => (int) $this->context->shop->id,
-            'reason' => pSQL(Tools::getValue('reason')),
+            'reason' => pSQL($reason),
             'status' => 'pending',
             'retractation_date' => $now,
             'deadline_date' => pSQL($eligibility['deadline']),
@@ -168,9 +202,11 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                 '{firstname}' => $customer->firstname,
                 '{lastname}' => $customer->lastname,
                 '{order_reference}' => $order->reference,
-                '{retractation_date}' => date('d/m/Y', strtotime($now)),
+                // WR-04: locale-aware date format
+                '{retractation_date}' => Tools::displayDate($now, null, false),
                 '{retractation_time}' => date('H:i:s', strtotime($now)),
-                '{reason}' => Tools::getValue('reason'),
+                // CR-05: HTML-safe reason in email
+                '{reason}' => htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'),
                 '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
                 '{shop_url}' => Tools::getShopDomainSsl(true),
             ];
@@ -191,7 +227,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         }
 
         $this->retractationData = [
-            'retractation_date' => date('d/m/Y', strtotime($now)),
+            'retractation_date' => Tools::displayDate($now, null, false),
             'retractation_time' => date('H:i:s', strtotime($now)),
             'order_reference' => $order->reference,
             'is_guest' => !$this->context->customer->isLogged(),
@@ -221,25 +257,8 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                 }
 
                 $customer = new Customer((int) $order->id_customer);
-                $guestEmail = pSQL(trim(Tools::getValue('lookup_email')));
-
-                require_once _PS_MODULE_DIR_ . 'retractation2026/classes/RetractationEligibilityService.php';
-                $service = new RetractationEligibilityService();
-                $eligibility = $service->getEligibility((int) $order->id);
-
-                if (!$eligibility['eligible']) {
-                    $this->errors[] = $this->trans('This order is not eligible for retractation.', [], 'Modules.Retractation2026.Front');
-                    $this->context->smarty->assign(['show_lookup' => true]);
-                    $this->setTemplate('module:retractation2026/views/templates/front/request.tpl');
-                    return;
-                }
-
-                $existing = Db::getInstance()->getValue(
-                    'SELECT id_retractation FROM `' . _DB_PREFIX_ . 'retractation`
-                     WHERE id_order = ' . (int) $order->id . ' AND status != \'cancelled\''
-                );
-                if ($existing) {
-                    $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Front');
+                $eligibility = $this->checkEligibility($order);
+                if (!$eligibility) {
                     $this->context->smarty->assign(['show_lookup' => true]);
                     $this->setTemplate('module:retractation2026/views/templates/front/request.tpl');
                     return;
@@ -253,9 +272,9 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                     'order' => $order,
                     'order_reference' => $order->reference,
                     'retractation_deadline' => $eligibility['deadline'],
-                    'retractation_token' => Tools::getToken(false),
+                    'retractation_token' => $this->generateFormToken(),
                     'is_guest' => true,
-                    'guest_email' => $guestEmail,
+                    'guest_email' => trim(Tools::getValue('lookup_email')),
                 ]);
                 $this->setTemplate('module:retractation2026/views/templates/front/request.tpl');
                 return;
@@ -274,23 +293,8 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                 return;
             }
 
-            require_once _PS_MODULE_DIR_ . 'retractation2026/classes/RetractationEligibilityService.php';
-            $service = new RetractationEligibilityService();
-            $eligibility = $service->getEligibility((int) $order->id);
-
-            if (!$eligibility['eligible']) {
-                $this->errors[] = $this->trans('This order is not eligible for retractation.', [], 'Modules.Retractation2026.Front');
-                $this->context->smarty->assign(['show_lookup' => true]);
-                $this->setTemplate('module:retractation2026/views/templates/front/request.tpl');
-                return;
-            }
-
-            $existing = Db::getInstance()->getValue(
-                'SELECT id_retractation FROM `' . _DB_PREFIX_ . 'retractation`
-                 WHERE id_order = ' . (int) $order->id . ' AND status != \'cancelled\''
-            );
-            if ($existing) {
-                $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Front');
+            $eligibility = $this->checkEligibility($order);
+            if (!$eligibility) {
                 $this->context->smarty->assign(['show_lookup' => true]);
                 $this->setTemplate('module:retractation2026/views/templates/front/request.tpl');
                 return;
@@ -307,7 +311,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                 'order' => $order,
                 'order_reference' => $order->reference,
                 'retractation_deadline' => $eligibility['deadline'],
-                'retractation_token' => Tools::getToken(false),
+                'retractation_token' => $this->generateFormToken(),
                 'is_guest' => $isGuest,
                 'guest_email' => $isGuest ? Tools::getValue('guest_email') : '',
             ]);

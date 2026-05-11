@@ -4,6 +4,7 @@ Après examen de votre demande, nous ne sommes malheureusement pas en mesure d'a
 
 Référence de commande : {order_reference}
 Date de la demande : {retractation_date}
+Heure de la demande : {retractation_time}
 Motif du refus : {reject_reason}
 
 Les motifs de refus les plus courants sont :

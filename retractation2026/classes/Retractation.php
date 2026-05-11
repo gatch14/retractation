@@ -29,8 +29,8 @@ class Retractation extends ObjectModel
         'primary' => 'id_retractation',
         'fields' => [
             'id_order' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true],
-            'id_customer' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId'],
-            'id_shop' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId'],
+            'id_customer' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true],
+            'id_shop' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true],
             'reason' => ['type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'],
             'status' => ['type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true],
             'retractation_date' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],

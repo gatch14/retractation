@@ -34,8 +34,8 @@
                     <span class="badge badge-secondary">{$retractation.status|escape:'html':'UTF-8'}</span>
                   {/if}
                 </td>
-                <td>{$retractation.retractation_date|escape:'html':'UTF-8'}</td>
-                <td>{$retractation.deadline_date|escape:'html':'UTF-8'}</td>
+                <td>{$retractation.retractation_date|date_format:'%d/%m/%Y'}</td>
+                <td>{$retractation.deadline_date|date_format:'%d/%m/%Y'}</td>
               </tr>
             {/foreach}
           </tbody>

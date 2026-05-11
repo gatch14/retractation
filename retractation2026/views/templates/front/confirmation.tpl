@@ -11,7 +11,7 @@
     </div>
 
     <div class="retractation-details">
-      <p><strong>{l s='Référence de commande :' mod='retractation2026'}</strong> {$order_reference}</p>
+      <p><strong>{l s='Référence de commande :' mod='retractation2026'}</strong> {$order_reference|escape:'htmlall':'UTF-8'}</p>
       <p><strong>{l s='Date de rétractation :' mod='retractation2026'}</strong> {$retractation_date}</p>
       <p><strong>{l s='Heure de rétractation :' mod='retractation2026'}</strong> {$retractation_time}</p>
     </div>

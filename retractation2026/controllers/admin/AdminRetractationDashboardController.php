@@ -102,12 +102,22 @@ class AdminRetractationDashboardController extends ModuleAdminController
             return parent::renderList();
         }
 
+        // CR-03: POST forms instead of GET links to prevent CSRF via XSS
         $statusActions = '';
         if ($row['status'] === 'pending') {
-            $acceptUrl = $this->context->link->getAdminLink('AdminRetractationDashboard') . '&id_retractation=' . $id . '&statusretractation&new_status=accepted';
-            $rejectUrl = $this->context->link->getAdminLink('AdminRetractationDashboard') . '&id_retractation=' . $id . '&statusretractation&new_status=rejected';
-            $statusActions = '<a href="' . $acceptUrl . '" class="btn btn-success"><i class="icon-check"></i> ' . $this->module->l('Accept', 'AdminRetractationDashboardController') . '</a> ';
-            $statusActions .= '<a href="' . $rejectUrl . '" class="btn btn-danger"><i class="icon-remove"></i> ' . $this->module->l('Reject', 'AdminRetractationDashboardController') . '</a>';
+            $baseUrl = $this->context->link->getAdminLink('AdminRetractationDashboard');
+            $statusActions = '<form method="post" action="' . $baseUrl . '" style="display:inline-block;margin-right:4px">'
+                . '<input type="hidden" name="id_retractation" value="' . $id . '" />'
+                . '<input type="hidden" name="statusretractation" value="1" />'
+                . '<input type="hidden" name="new_status" value="accepted" />'
+                . '<button type="submit" class="btn btn-success"><i class="icon-check"></i> ' . $this->module->l('Accept', 'AdminRetractationDashboardController') . '</button>'
+                . '</form>';
+            $statusActions .= '<form method="post" action="' . $baseUrl . '" style="display:inline-block">'
+                . '<input type="hidden" name="id_retractation" value="' . $id . '" />'
+                . '<input type="hidden" name="statusretractation" value="1" />'
+                . '<input type="hidden" name="new_status" value="rejected" />'
+                . '<button type="submit" class="btn btn-danger"><i class="icon-remove"></i> ' . $this->module->l('Reject', 'AdminRetractationDashboardController') . '</button>'
+                . '</form>';
         }
 
         $html = '<div class="panel">';
@@ -148,7 +158,9 @@ class AdminRetractationDashboardController extends ModuleAdminController
 
     public function postProcess()
     {
-        if (Tools::getIsset('statusretractation') && Tools::getValue('id_retractation') && Tools::getValue('new_status')) {
+        if (Tools::getIsset('statusretractation') && Tools::getValue('id_retractation') && Tools::getValue('new_status')
+            && $_SERVER['REQUEST_METHOD'] === 'POST'
+        ) {
             $id = (int) Tools::getValue('id_retractation');
             $newStatus = pSQL(Tools::getValue('new_status'));
             $allowed = ['accepted', 'rejected', 'cancelled'];
@@ -180,16 +192,19 @@ class AdminRetractationDashboardController extends ModuleAdminController
 
     private function sendStatusEmail($idRetractation, $status)
     {
-        if (!in_array($status, ['accepted', 'rejected', 'cancelled'])) {
+        // CR-04: cancelled is not a rejection — no email to avoid legal confusion
+        if (!in_array($status, ['accepted', 'rejected'])) {
             return;
         }
 
+        // CR-09: id_shop filter prevents cross-shop data leak in multi-shop
         $row = Db::getInstance()->getRow(
             'SELECT r.*, o.reference as order_reference, c.firstname, c.lastname, c.email as customer_email
              FROM `' . _DB_PREFIX_ . 'retractation` r
              LEFT JOIN `' . _DB_PREFIX_ . 'orders` o ON o.id_order = r.id_order
              LEFT JOIN `' . _DB_PREFIX_ . 'customer` c ON c.id_customer = r.id_customer
-             WHERE r.id_retractation = ' . (int) $idRetractation
+             WHERE r.id_retractation = ' . (int) $idRetractation . '
+               AND r.id_shop = ' . (int) Shop::getContextShopID()
         );
         if (!$row) {
             return;
@@ -199,7 +214,8 @@ class AdminRetractationDashboardController extends ModuleAdminController
             '{firstname}' => $row['firstname'],
             '{lastname}' => $row['lastname'],
             '{order_reference}' => $row['order_reference'],
-            '{retractation_date}' => date('d/m/Y', strtotime($row['date_add'])),
+            '{retractation_date}' => Tools::displayDate($row['date_add'], (int) Context::getContext()->language->id, false),
+            '{retractation_time}' => date('H:i', strtotime($row['date_add'])),
             '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
             '{shop_url}' => Context::getContext()->link->getBaseLink(),
             '{reject_reason}' => $status === 'rejected'
@@ -207,13 +223,13 @@ class AdminRetractationDashboardController extends ModuleAdminController
                 : '',
         ];
 
-        $emailStatus = ($status === 'cancelled') ? 'rejected' : $status;
-        $template = 'retractation_' . $emailStatus;
-        $subject = $emailStatus === 'accepted'
+        $template = 'retractation_' . $status;
+        $subject = $status === 'accepted'
             ? $this->module->l('Your retractation has been accepted', 'AdminRetractationDashboardController')
             : $this->module->l('Your retractation has been rejected', 'AdminRetractationDashboardController');
 
-        @Mail::Send(
+        // WR-01: removed @ suppression — failures now visible
+        $sent = Mail::Send(
             (int) Context::getContext()->language->id,
             $template,
             $subject,
@@ -226,6 +242,9 @@ class AdminRetractationDashboardController extends ModuleAdminController
             null,
             _PS_MODULE_DIR_ . 'retractation2026/mails/'
         );
+        if (!$sent) {
+            $this->warnings[] = $this->module->l('Email notification could not be sent.', 'AdminRetractationDashboardController');
+        }
     }
 
     public function getStatusBadge($value)

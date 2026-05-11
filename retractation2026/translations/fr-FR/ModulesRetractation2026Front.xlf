@@ -174,6 +174,50 @@
         <source>Right of withdrawal</source>
         <target>Droit de rétractation</target>
       </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70001" resname="This order is not eligible for retractation.">
+        <source>This order is not eligible for retractation.</source>
+        <target>Cette commande n'est pas éligible à la rétractation.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70002" resname="Please provide your email and order reference.">
+        <source>Please provide your email and order reference.</source>
+        <target>Veuillez renseigner votre adresse email et la référence de commande.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70003" resname="Invalid email address.">
+        <source>Invalid email address.</source>
+        <target>Adresse email invalide.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70004" resname="No order found with this reference and email.">
+        <source>No order found with this reference and email.</source>
+        <target>Aucune commande trouvée avec cette référence et cet email.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70005" resname="Invalid order.">
+        <source>Invalid order.</source>
+        <target>Commande invalide.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70006" resname="Order not found.">
+        <source>Order not found.</source>
+        <target>Commande introuvable.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70007" resname="You do not have permission to access this order.">
+        <source>You do not have permission to access this order.</source>
+        <target>Vous n'êtes pas autorisé à accéder à cette commande.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70008" resname="Invalid security token. Please try again.">
+        <source>Invalid security token. Please try again.</source>
+        <target>Jeton de sécurité invalide. Veuillez réessayer.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f70009" resname="An error occurred while processing your request. Please try again.">
+        <source>An error occurred while processing your request. Please try again.</source>
+        <target>Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f7000a" resname="A retractation request already exists for this order.">
+        <source>A retractation request already exists for this order.</source>
+        <target>Une demande de rétractation existe déjà pour cette commande.</target>
+      </trans-unit>
+      <trans-unit id="a2b3c4d5e6f7000b" resname="This order does not belong to your account.">
+        <source>This order does not belong to your account.</source>
+        <target>Cette commande n'appartient pas à votre compte.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

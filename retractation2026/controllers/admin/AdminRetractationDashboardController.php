@@ -112,10 +112,14 @@ class AdminRetractationDashboardController extends ModuleAdminController
                 . '<input type="hidden" name="new_status" value="accepted" />'
                 . '<button type="submit" class="btn btn-success"><i class="icon-check"></i> ' . $this->module->l('Accept', 'AdminRetractationDashboardController') . '</button>'
                 . '</form>';
-            $statusActions .= '<form method="post" action="' . $baseUrl . '" style="display:inline-block">'
+            $statusActions .= '<form method="post" action="' . $baseUrl . '">'
                 . '<input type="hidden" name="id_retractation" value="' . $id . '" />'
                 . '<input type="hidden" name="statusretractation" value="1" />'
                 . '<input type="hidden" name="new_status" value="rejected" />'
+                . '<div class="form-group" style="margin-top:12px">'
+                . '<label><strong>' . $this->module->l('Rejection reason (required)', 'AdminRetractationDashboardController') . '</strong></label>'
+                . '<textarea name="reject_reason" class="form-control" rows="3" maxlength="1000" required placeholder="' . $this->module->l('Enter the reason for rejection...', 'AdminRetractationDashboardController') . '"></textarea>'
+                . '</div>'
                 . '<button type="submit" class="btn btn-danger"><i class="icon-remove"></i> ' . $this->module->l('Reject', 'AdminRetractationDashboardController') . '</button>'
                 . '</form>';
         }
@@ -138,9 +142,14 @@ class AdminRetractationDashboardController extends ModuleAdminController
         $html .= '</table>';
         $html .= '</div>';
         $html .= '<div class="col-lg-6">';
-        $html .= '<div class="panel"><div class="panel-heading">' . $this->module->l('Reason', 'AdminRetractationDashboardController') . '</div>';
-        $html .= '<p>' . nl2br(htmlspecialchars($row['reason'], ENT_QUOTES, 'UTF-8')) . '</p>';
+        $html .= '<div class="panel"><div class="panel-heading">' . $this->module->l('Customer reason', 'AdminRetractationDashboardController') . '</div>';
+        $html .= '<p>' . nl2br(htmlspecialchars($row['reason'] ?? '', ENT_QUOTES, 'UTF-8')) . '</p>';
         $html .= '</div>';
+        if ($row['status'] === 'rejected' && !empty($row['reject_reason'])) {
+            $html .= '<div class="panel panel-danger"><div class="panel-heading">' . $this->module->l('Rejection reason', 'AdminRetractationDashboardController') . '</div>';
+            $html .= '<p>' . nl2br(htmlspecialchars($row['reject_reason'], ENT_QUOTES, 'UTF-8')) . '</p>';
+            $html .= '</div>';
+        }
         if ($statusActions) {
             $html .= '<div class="panel"><div class="panel-heading">' . $this->module->l('Actions', 'AdminRetractationDashboardController') . '</div>';
             $html .= $statusActions;
@@ -168,10 +177,28 @@ class AdminRetractationDashboardController extends ModuleAdminController
                 $this->errors[] = $this->module->l('Invalid status.', 'AdminRetractationDashboardController');
                 return;
             }
-            $result = Db::getInstance()->update('retractation', [
+
+            $rejectReason = null;
+            if ($newStatus === 'rejected') {
+                $rejectReason = strip_tags(trim(Tools::getValue('reject_reason', '')));
+                if (empty($rejectReason)) {
+                    $this->errors[] = $this->module->l('Please enter a rejection reason.', 'AdminRetractationDashboardController');
+                    return;
+                }
+                if (mb_strlen($rejectReason) > 1000) {
+                    $rejectReason = mb_substr($rejectReason, 0, 1000);
+                }
+            }
+
+            $updateData = [
                 'status' => $newStatus,
                 'date_upd' => date('Y-m-d H:i:s'),
-            ], 'id_retractation = ' . $id . ' AND id_shop = ' . (int) Shop::getContextShopID());
+            ];
+            if ($rejectReason !== null) {
+                $updateData['reject_reason'] = pSQL($rejectReason);
+            }
+
+            $result = Db::getInstance()->update('retractation', $updateData, 'id_retractation = ' . $id . ' AND id_shop = ' . (int) Shop::getContextShopID());
 
             if ($result) {
                 $this->sendStatusEmail($id, $newStatus);
@@ -219,7 +246,7 @@ class AdminRetractationDashboardController extends ModuleAdminController
             '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
             '{shop_url}' => Context::getContext()->link->getBaseLink(),
             '{reject_reason}' => $status === 'rejected'
-                ? $this->module->l('Your request does not meet the eligibility criteria.', 'AdminRetractationDashboardController')
+                ? htmlspecialchars($row['reject_reason'] ?? '', ENT_QUOTES, 'UTF-8')
                 : '',
         ];
 

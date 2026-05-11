@@ -38,7 +38,8 @@ class RetractationEligibilityService
 
         // L221-28: virtual/downloadable products are exempt from the right of withdrawal
         $hasOnlyVirtual = (bool) Db::getInstance()->getValue(
-            'SELECT MIN(od.is_virtual) FROM `' . _DB_PREFIX_ . 'order_detail` od
+            'SELECT MIN(p.is_virtual) FROM `' . _DB_PREFIX_ . 'order_detail` od
+             JOIN `' . _DB_PREFIX_ . 'product` p ON p.id_product = od.product_id
              WHERE od.id_order = ' . $idOrder
         );
         if ($hasOnlyVirtual) {

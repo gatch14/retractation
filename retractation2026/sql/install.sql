@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `PREFIX_retractation` (
     `id_customer` INT UNSIGNED NOT NULL,
     `id_shop` INT UNSIGNED NOT NULL DEFAULT 1,
     `reason` TEXT,
+    `reject_reason` TEXT NULL,
     `status` VARCHAR(32) NOT NULL DEFAULT 'pending',
     `retractation_date` DATETIME NOT NULL,
     `deadline_date` DATETIME NOT NULL,

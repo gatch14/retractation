@@ -17,6 +17,10 @@ class Retractation2026 extends Module
         'RETRACTATION_BUFFER_ORDER',
         'RETRACTATION_ENABLED',
         'RETRACTATION_EMAIL_ENABLED',
+        'RETRACTATION_SHOW_PRODUCT_NOTICE',
+        'RETRACTATION_SHOW_CART_NOTICE',
+        'RETRACTATION_PRODUCT_NOTICE_TEXT',
+        'RETRACTATION_CART_NOTICE_TEXT',
     ];
 
     const CONFIG_DEFAULTS = [
@@ -25,6 +29,10 @@ class Retractation2026 extends Module
         'RETRACTATION_BUFFER_ORDER' => 14,
         'RETRACTATION_ENABLED' => 1,
         'RETRACTATION_EMAIL_ENABLED' => 1,
+        'RETRACTATION_SHOW_PRODUCT_NOTICE' => 1,
+        'RETRACTATION_SHOW_CART_NOTICE' => 1,
+        'RETRACTATION_PRODUCT_NOTICE_TEXT' => '',
+        'RETRACTATION_CART_NOTICE_TEXT' => '',
     ];
 
     const HOOKS = [
@@ -69,11 +77,17 @@ class Retractation2026 extends Module
             return false;
         }
 
+        $this->installTranslations();
+
         Configuration::updateValue('RETRACTATION_DELAY_DAYS', 14);
         Configuration::updateValue('RETRACTATION_BUFFER_SHIPPED', 7);
         Configuration::updateValue('RETRACTATION_BUFFER_ORDER', 14);
         Configuration::updateValue('RETRACTATION_ENABLED', 1);
         Configuration::updateValue('RETRACTATION_EMAIL_ENABLED', 1);
+        Configuration::updateValue('RETRACTATION_SHOW_PRODUCT_NOTICE', 1);
+        Configuration::updateValue('RETRACTATION_SHOW_CART_NOTICE', 1);
+        Configuration::updateValue('RETRACTATION_PRODUCT_NOTICE_TEXT', '', true);
+        Configuration::updateValue('RETRACTATION_CART_NOTICE_TEXT', '', true);
 
         $tab = new Tab();
         $tab->class_name = 'AdminRetractationDashboard';
@@ -241,6 +255,10 @@ class Retractation2026 extends Module
         Configuration::deleteByName('RETRACTATION_BUFFER_ORDER');
         Configuration::deleteByName('RETRACTATION_ENABLED');
         Configuration::deleteByName('RETRACTATION_EMAIL_ENABLED');
+        Configuration::deleteByName('RETRACTATION_SHOW_PRODUCT_NOTICE');
+        Configuration::deleteByName('RETRACTATION_SHOW_CART_NOTICE');
+        Configuration::deleteByName('RETRACTATION_PRODUCT_NOTICE_TEXT');
+        Configuration::deleteByName('RETRACTATION_CART_NOTICE_TEXT');
 
         return parent::uninstall();
     }
@@ -253,6 +271,10 @@ class Retractation2026 extends Module
             Configuration::updateValue('RETRACTATION_BUFFER_ORDER', (int) Tools::getValue('RETRACTATION_BUFFER_ORDER'));
             Configuration::updateValue('RETRACTATION_ENABLED', (bool) Tools::getValue('RETRACTATION_ENABLED'));
             Configuration::updateValue('RETRACTATION_EMAIL_ENABLED', (bool) Tools::getValue('RETRACTATION_EMAIL_ENABLED'));
+            Configuration::updateValue('RETRACTATION_SHOW_PRODUCT_NOTICE', (bool) Tools::getValue('RETRACTATION_SHOW_PRODUCT_NOTICE'));
+            Configuration::updateValue('RETRACTATION_SHOW_CART_NOTICE', (bool) Tools::getValue('RETRACTATION_SHOW_CART_NOTICE'));
+            Configuration::updateValue('RETRACTATION_PRODUCT_NOTICE_TEXT', Tools::getValue('RETRACTATION_PRODUCT_NOTICE_TEXT'), true);
+            Configuration::updateValue('RETRACTATION_CART_NOTICE_TEXT', Tools::getValue('RETRACTATION_CART_NOTICE_TEXT'), true);
 
             $this->context->controller->confirmations[] = $this->trans('Settings updated.', [], 'Modules.Retractation2026.Admin');
         }
@@ -335,6 +357,13 @@ class Retractation2026 extends Module
 
     public function hookDisplayShoppingCartFooter(array $params): string
     {
+        if (!(bool) Configuration::get('RETRACTATION_SHOW_CART_NOTICE')) {
+            return '';
+        }
+        $this->context->smarty->assign([
+            'retractation_cart_notice_text' => Configuration::get('RETRACTATION_CART_NOTICE_TEXT'),
+        ]);
+
         return $this->display(__FILE__, 'views/templates/hook/displayShoppingCartFooter.tpl');
     }
 
@@ -344,6 +373,13 @@ class Retractation2026 extends Module
         if (!empty($params['product']['is_virtual'])) {
             return '';
         }
+        if (!(bool) Configuration::get('RETRACTATION_SHOW_PRODUCT_NOTICE')) {
+            return '';
+        }
+        $this->context->smarty->assign([
+            'retractation_product_notice_text' => Configuration::get('RETRACTATION_PRODUCT_NOTICE_TEXT'),
+        ]);
+
         return $this->display(__FILE__, 'views/templates/hook/displayProductAdditionalInfo.tpl');
     }
 
@@ -398,6 +434,43 @@ class Retractation2026 extends Module
                             ['id' => 'email_off', 'value' => 0, 'label' => $this->trans('Non', [], 'Modules.Retractation2026.Admin')],
                         ],
                     ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->trans('Afficher la notice sur les fiches produit', [], 'Modules.Retractation2026.Admin'),
+                        'name' => 'RETRACTATION_SHOW_PRODUCT_NOTICE',
+                        'desc' => $this->trans('Masquer pour les produits dématérialisés ou si vous gérez la notice via le thème', [], 'Modules.Retractation2026.Admin'),
+                        'values' => [
+                            ['id' => 'pnotice_on', 'value' => 1, 'label' => $this->trans('Oui', [], 'Modules.Retractation2026.Admin')],
+                            ['id' => 'pnotice_off', 'value' => 0, 'label' => $this->trans('Non', [], 'Modules.Retractation2026.Admin')],
+                        ],
+                    ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->trans('Afficher la notice dans le panier', [], 'Modules.Retractation2026.Admin'),
+                        'name' => 'RETRACTATION_SHOW_CART_NOTICE',
+                        'values' => [
+                            ['id' => 'cnotice_on', 'value' => 1, 'label' => $this->trans('Oui', [], 'Modules.Retractation2026.Admin')],
+                            ['id' => 'cnotice_off', 'value' => 0, 'label' => $this->trans('Non', [], 'Modules.Retractation2026.Admin')],
+                        ],
+                    ],
+                    [
+                        'type' => 'textarea',
+                        'label' => $this->trans('Texte personnalisé — fiche produit', [], 'Modules.Retractation2026.Admin'),
+                        'name' => 'RETRACTATION_PRODUCT_NOTICE_TEXT',
+                        'desc' => $this->trans('Laissez vide pour afficher le texte par défaut du module', [], 'Modules.Retractation2026.Admin'),
+                        'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 6,
+                    ],
+                    [
+                        'type' => 'textarea',
+                        'label' => $this->trans('Texte personnalisé — panier', [], 'Modules.Retractation2026.Admin'),
+                        'name' => 'RETRACTATION_CART_NOTICE_TEXT',
+                        'desc' => $this->trans('Laissez vide pour afficher le texte par défaut du module', [], 'Modules.Retractation2026.Admin'),
+                        'autoload_rte' => true,
+                        'cols' => 60,
+                        'rows' => 6,
+                    ],
                 ],
                 'submit' => [
                     'title' => $this->trans('Enregistrer', [], 'Modules.Retractation2026.Admin'),
@@ -421,8 +494,124 @@ class Retractation2026 extends Module
         $helper->fields_value['RETRACTATION_BUFFER_ORDER'] = Configuration::get('RETRACTATION_BUFFER_ORDER');
         $helper->fields_value['RETRACTATION_ENABLED'] = Configuration::get('RETRACTATION_ENABLED');
         $helper->fields_value['RETRACTATION_EMAIL_ENABLED'] = Configuration::get('RETRACTATION_EMAIL_ENABLED');
+        $helper->fields_value['RETRACTATION_SHOW_PRODUCT_NOTICE'] = Configuration::get('RETRACTATION_SHOW_PRODUCT_NOTICE');
+        $helper->fields_value['RETRACTATION_SHOW_CART_NOTICE'] = Configuration::get('RETRACTATION_SHOW_CART_NOTICE');
+        $helper->fields_value['RETRACTATION_PRODUCT_NOTICE_TEXT'] = Configuration::get('RETRACTATION_PRODUCT_NOTICE_TEXT');
+        $helper->fields_value['RETRACTATION_CART_NOTICE_TEXT'] = Configuration::get('RETRACTATION_CART_NOTICE_TEXT');
 
         return $helper->generateForm([$fields_form]);
+    }
+
+    private function installTranslations()
+    {
+        $idLang = (int) Language::getIdByIso('fr');
+        if (!$idLang) {
+            return;
+        }
+
+        $db = Db::getInstance();
+        $domains = ['ModulesRetractation2026Front', 'ModulesRetractation2026Admin'];
+        foreach ($domains as $domain) {
+            $db->execute(
+                'DELETE FROM `' . _DB_PREFIX_ . 'translation`
+                 WHERE domain = \'' . pSQL($domain) . '\' AND id_lang = ' . $idLang
+            );
+        }
+
+        $front = [
+            'My retractation requests' => 'Mes demandes de rétractation',
+            'Order Reference' => 'Référence de commande',
+            'Status' => 'Statut',
+            'Retractation Date' => 'Date de rétractation',
+            'Deadline Date' => 'Date limite',
+            'Pending' => 'En attente',
+            'Accepted' => 'Acceptée',
+            'Rejected' => 'Refusée',
+            'Cancelled' => 'Annulée',
+            'You have no retractation requests.' => 'Vous n\'avez aucune demande de rétractation.',
+            'Back to my account' => 'Retour à mon compte',
+            'Legal information' => 'Informations légales',
+            'Right of withdrawal' => 'Droit de rétractation',
+            'This product is eligible for the legal right of withdrawal.' => 'Ce produit est éligible au droit légal de rétractation.',
+            'You may return it within the statutory deadline after delivery.' => 'Vous pouvez le retourner dans le délai légal suivant la livraison.',
+            'In accordance with applicable consumer protection law, you have a right of withdrawal that you may exercise within the legal deadline after receiving your order.' => 'Conformément au droit de la consommation applicable, vous disposez d\'un droit de rétractation que vous pouvez exercer dans le délai légal suivant la réception de votre commande.',
+            'You can submit your withdrawal request from the "My retractations" section of your customer account.' => 'Vous pouvez soumettre votre demande de rétractation depuis la rubrique « Mes rétractations » de votre espace client.',
+            'You can submit your withdrawal request from our online withdrawal form.' => 'Vous pouvez soumettre votre demande de rétractation depuis notre formulaire de rétractation en ligne.',
+            'Demande de rétractation' => 'Demande de rétractation',
+            'Pour exercer votre droit de rétractation, veuillez renseigner votre adresse email et la référence de votre commande.' => 'Pour exercer votre droit de rétractation, veuillez renseigner votre adresse email et la référence de votre commande.',
+            'Adresse email' => 'Adresse email',
+            'Email utilisé lors de la commande' => 'Email utilisé lors de la commande',
+            'Référence de commande' => 'Référence de commande',
+            'Ex: ABCDEFGH' => 'Ex : ABCDEFGH',
+            'Rechercher ma commande' => 'Rechercher ma commande',
+            'Date limite de rétractation :' => 'Date limite de rétractation :',
+            'Prénom' => 'Prénom',
+            'Nom' => 'Nom',
+            'Email' => 'Email',
+            'Motif (facultatif)' => 'Motif (facultatif)',
+            'Indiquez le motif de votre rétractation si vous le souhaitez' => 'Indiquez le motif de votre rétractation si vous le souhaitez',
+            'Confirmer la rétractation' => 'Confirmer la rétractation',
+            'Vous pouvez exercer votre droit de rétractation jusqu\'au' => 'Vous pouvez exercer votre droit de rétractation jusqu\'au',
+            'Renoncer au contrat ici' => 'Renoncer au contrat ici',
+            'Confirmation de rétractation' => 'Confirmation de rétractation',
+            'Votre demande de rétractation a été enregistrée avec succès.' => 'Votre demande de rétractation a été enregistrée avec succès.',
+            'Référence de commande :' => 'Référence de commande :',
+            'Date de rétractation :' => 'Date de rétractation :',
+            'Heure de rétractation :' => 'Heure de rétractation :',
+            'Un email de confirmation vous sera envoyé.' => 'Un email de confirmation vous sera envoyé.',
+            'Retour au suivi de commande' => 'Retour au suivi de commande',
+            'Retour à mes commandes' => 'Retour à mes commandes',
+            'Exercer mon droit de rétractation' => 'Exercer mon droit de rétractation',
+            'This order is not eligible for retractation.' => 'Cette commande n\'est pas éligible à la rétractation.',
+            'Please provide your email and order reference.' => 'Veuillez renseigner votre adresse email et la référence de commande.',
+            'Invalid email address.' => 'Adresse email invalide.',
+            'No order found with this reference and email.' => 'Aucune commande trouvée avec cette référence et cet email.',
+            'Invalid order.' => 'Commande invalide.',
+            'Order not found.' => 'Commande introuvable.',
+            'You do not have permission to access this order.' => 'Vous n\'êtes pas autorisé à accéder à cette commande.',
+            'Invalid security token. Please try again.' => 'Jeton de sécurité invalide. Veuillez réessayer.',
+            'An error occurred while processing your request. Please try again.' => 'Une erreur est survenue lors du traitement de votre demande. Veuillez réessayer.',
+            'A retractation request already exists for this order.' => 'Une demande de rétractation existe déjà pour cette commande.',
+            'This order does not belong to your account.' => 'Cette commande n\'appartient pas à votre compte.',
+            'Confirmation of your retractation — Order %s' => 'Confirmation de votre rétractation — Commande %s',
+        ];
+
+        $admin = [
+            'Rétractation 2026' => 'Rétractation 2026',
+            'Settings updated.' => 'Paramètres enregistrés.',
+            'Délai légal de rétractation (jours)' => 'Délai légal de rétractation (jours)',
+            'Nombre de jours calendaires du délai légal (14 par défaut)' => 'Nombre de jours calendaires du délai légal (14 par défaut)',
+            'Buffer expédition (jours)' => 'Buffer expédition (jours)',
+            'Jours ajoutés quand seul le statut expédié est connu' => 'Jours ajoutés quand seul le statut expédié est connu',
+            'Buffer commande (jours)' => 'Buffer commande (jours)',
+            'Jours ajoutés quand seule la date de commande est connue' => 'Jours ajoutés quand seule la date de commande est connue',
+            'Module actif' => 'Module actif',
+            'Oui' => 'Oui',
+            'Non' => 'Non',
+            'Envoyer un email de confirmation' => 'Envoyer un email de confirmation',
+            'Afficher la notice sur les fiches produit' => 'Afficher la notice sur les fiches produit',
+            'Masquer pour les produits dématérialisés ou si vous gérez la notice via le thème' => 'Masquer pour les produits dématérialisés ou si vous gérez la notice via le thème',
+            'Afficher la notice dans le panier' => 'Afficher la notice dans le panier',
+            'Texte personnalisé — fiche produit' => 'Texte personnalisé — fiche produit',
+            'Laissez vide pour afficher le texte par défaut du module' => 'Laissez vide pour afficher le texte par défaut du module',
+            'Texte personnalisé — panier' => 'Texte personnalisé — panier',
+            'Enregistrer' => 'Enregistrer',
+            'Êtes-vous sûr de vouloir désinstaller ce module ? Toutes les données de rétractation seront perdues.' => 'Êtes-vous sûr de vouloir désinstaller ce module ? Toutes les données de rétractation seront perdues.',
+            'Rejection reason (required)' => 'Motif de refus (obligatoire)',
+            'Enter the reason for rejection...' => 'Saisissez le motif de refus...',
+            'Please enter a rejection reason.' => 'Veuillez saisir un motif de refus.',
+            'Rejection reason' => 'Motif de refus',
+            'Customer reason' => 'Motif du client',
+        ];
+
+        foreach (['ModulesRetractation2026Front' => $front, 'ModulesRetractation2026Admin' => $admin] as $domain => $strings) {
+            foreach ($strings as $key => $translation) {
+                $db->execute(
+                    'INSERT INTO `' . _DB_PREFIX_ . 'translation` (id_lang, `key`, translation, domain, theme)
+                     VALUES (' . $idLang . ', \'' . pSQL($key) . '\', \'' . pSQL($translation) . '\', \'' . pSQL($domain) . '\', NULL)'
+                );
+            }
+        }
     }
 
     private function executeSqlFile($filename)

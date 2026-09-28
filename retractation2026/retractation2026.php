@@ -22,6 +22,8 @@ class Retractation2026 extends Module
         'RETRACTATION_PRODUCT_NOTICE_TEXT',
         'RETRACTATION_CART_NOTICE_TEXT',
         'RETRACTATION_ADMIN_EMAIL_ENABLED',
+        'RETRACTATION_EXCLUDED_PRODUCTS',
+        'RETRACTATION_EXCLUDED_CATEGORIES',
     ];
 
     const CONFIG_DEFAULTS = [
@@ -35,6 +37,8 @@ class Retractation2026 extends Module
         'RETRACTATION_PRODUCT_NOTICE_TEXT' => '',
         'RETRACTATION_CART_NOTICE_TEXT' => '',
         'RETRACTATION_ADMIN_EMAIL_ENABLED' => 1,
+        'RETRACTATION_EXCLUDED_PRODUCTS' => '',
+        'RETRACTATION_EXCLUDED_CATEGORIES' => '',
     ];
 
     const HOOKS = [
@@ -49,7 +53,7 @@ class Retractation2026 extends Module
     {
         $this->name = 'retractation2026';
         $this->tab = 'legal_compliance';
-        $this->version = '1.0.1';
+        $this->version = '1.1.0';
         $this->author = 'GSD';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
@@ -90,6 +94,8 @@ class Retractation2026 extends Module
         Configuration::updateValue('RETRACTATION_PRODUCT_NOTICE_TEXT', '', true);
         Configuration::updateValue('RETRACTATION_CART_NOTICE_TEXT', '', true);
         Configuration::updateValue('RETRACTATION_ADMIN_EMAIL_ENABLED', 1);
+        Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', '');
+        Configuration::updateValue('RETRACTATION_EXCLUDED_CATEGORIES', '');
 
         $tab = new Tab();
         $tab->class_name = 'AdminRetractationDashboard';
@@ -191,6 +197,8 @@ class Retractation2026 extends Module
             Configuration::updateValue('RETRACTATION_SHOW_CART_NOTICE', (bool) Tools::getValue('RETRACTATION_SHOW_CART_NOTICE'));
             Configuration::updateValue('RETRACTATION_PRODUCT_NOTICE_TEXT', Tools::getValue('RETRACTATION_PRODUCT_NOTICE_TEXT'), true);
             Configuration::updateValue('RETRACTATION_CART_NOTICE_TEXT', Tools::getValue('RETRACTATION_CART_NOTICE_TEXT'), true);
+            Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', Tools::getValue('RETRACTATION_EXCLUDED_PRODUCTS'));
+            Configuration::updateValue('RETRACTATION_EXCLUDED_CATEGORIES', Tools::getValue('RETRACTATION_EXCLUDED_CATEGORIES'));
 
             $this->context->controller->confirmations[] = $this->trans('Settings updated.', [], 'Modules.Retractation2026.Admin');
         }
@@ -292,6 +300,7 @@ class Retractation2026 extends Module
         }
         $this->context->smarty->assign([
             'retractation_cart_notice_text' => Configuration::get('RETRACTATION_CART_NOTICE_TEXT'),
+            'retractation_form_url' => $this->context->link->getModuleLink($this->name, 'request'),
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/displayShoppingCartFooter.tpl');
@@ -299,18 +308,41 @@ class Retractation2026 extends Module
 
     public function hookDisplayProductAdditionalInfo(array $params): string
     {
-        // IN-03/CR-06: do not show withdrawal notice for virtual/downloadable products (L221-28)
-        if (!empty($params['product']['is_virtual'])) {
-            return '';
-        }
         if (!(bool) Configuration::get('RETRACTATION_SHOW_PRODUCT_NOTICE')) {
             return '';
         }
+
+        $idProduct = (int) ($params['product']['id_product'] ?? 0);
+        $isVirtual = !empty($params['product']['is_virtual']);
+        $isExcluded = $idProduct > 0 && $this->isProductExcluded($idProduct);
+
         $this->context->smarty->assign([
+            'retractation_product_eligible' => !$isVirtual && !$isExcluded,
             'retractation_product_notice_text' => Configuration::get('RETRACTATION_PRODUCT_NOTICE_TEXT'),
+            'retractation_form_url' => $this->context->link->getModuleLink($this->name, 'request'),
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/displayProductAdditionalInfo.tpl');
+    }
+
+    private function isProductExcluded(int $idProduct): bool
+    {
+        $excludedProducts = array_filter(array_map('intval', explode(',', (string) Configuration::get('RETRACTATION_EXCLUDED_PRODUCTS'))));
+        if (in_array($idProduct, $excludedProducts, true)) {
+            return true;
+        }
+
+        $excludedCategories = array_filter(array_map('intval', explode(',', (string) Configuration::get('RETRACTATION_EXCLUDED_CATEGORIES'))));
+        if (empty($excludedCategories)) {
+            return false;
+        }
+
+        return (bool) Db::getInstance()->getValue(
+            'SELECT 1 FROM `' . _DB_PREFIX_ . 'category_product`
+             WHERE `id_product` = ' . $idProduct . '
+               AND `id_category` IN (' . implode(',', $excludedCategories) . ')
+             LIMIT 1'
+        );
     }
 
     private function displayForm()
@@ -411,6 +443,18 @@ class Retractation2026 extends Module
                         'cols' => 60,
                         'rows' => 6,
                     ],
+                    [
+                        'type' => 'text',
+                        'label' => $this->trans('Produits exclus du droit de rétractation', [], 'Modules.Retractation2026.Admin'),
+                        'name' => 'RETRACTATION_EXCLUDED_PRODUCTS',
+                        'desc' => $this->trans('IDs de produits séparés par des virgules (article L.221-28).', [], 'Modules.Retractation2026.Admin'),
+                    ],
+                    [
+                        'type' => 'text',
+                        'label' => $this->trans('Catégories exclues du droit de rétractation', [], 'Modules.Retractation2026.Admin'),
+                        'name' => 'RETRACTATION_EXCLUDED_CATEGORIES',
+                        'desc' => $this->trans('IDs de catégories séparés par des virgules (article L.221-28).', [], 'Modules.Retractation2026.Admin'),
+                    ],
                 ],
                 'submit' => [
                     'title' => $this->trans('Enregistrer', [], 'Modules.Retractation2026.Admin'),
@@ -439,6 +483,8 @@ class Retractation2026 extends Module
         $helper->fields_value['RETRACTATION_SHOW_CART_NOTICE'] = Configuration::get('RETRACTATION_SHOW_CART_NOTICE');
         $helper->fields_value['RETRACTATION_PRODUCT_NOTICE_TEXT'] = Configuration::get('RETRACTATION_PRODUCT_NOTICE_TEXT');
         $helper->fields_value['RETRACTATION_CART_NOTICE_TEXT'] = Configuration::get('RETRACTATION_CART_NOTICE_TEXT');
+        $helper->fields_value['RETRACTATION_EXCLUDED_PRODUCTS'] = Configuration::get('RETRACTATION_EXCLUDED_PRODUCTS');
+        $helper->fields_value['RETRACTATION_EXCLUDED_CATEGORIES'] = Configuration::get('RETRACTATION_EXCLUDED_CATEGORIES');
 
         return $helper->generateForm([$fields_form]);
     }
@@ -516,6 +562,10 @@ class Retractation2026 extends Module
             'This order does not belong to your account.' => 'Cette commande n\'appartient pas à votre compte.',
             'Confirmation of your retractation — Order %s' => 'Confirmation de votre rétractation — Commande %s',
             'New retractation request — Order %s' => 'Nouvelle demande de rétractation — Commande %s',
+            'Withdrawal form' => 'Formulaire de rétractation',
+            'In accordance with Article L.221-18 of the French Consumer Code, you have a right of withdrawal of 14 calendar days from receipt of this product.' => 'Conformément à l\'article L.221-18 du Code de la consommation, vous disposez d\'un droit de rétractation de 14 jours calendaires à compter de la réception de ce produit.',
+            'This product is excluded from the right of withdrawal in accordance with Article L.221-28 of the French Consumer Code.' => 'Ce produit est exclu du droit de rétractation conformément à l\'article L.221-28 du Code de la consommation.',
+            'In accordance with Article L.221-18 of the French Consumer Code, you have a right of withdrawal of 14 calendar days from receipt of your order. If the deadline expires on a Saturday, Sunday or public holiday, it is extended to the next working day.' => 'Conformément à l\'article L.221-18 du Code de la consommation, vous disposez d\'un droit de rétractation de 14 jours calendaires à compter de la réception de votre commande. Si le délai expire un samedi, dimanche ou jour férié, il est prolongé jusqu\'au premier jour ouvrable suivant.',
         ];
 
         $admin = [
@@ -566,6 +616,10 @@ class Retractation2026 extends Module
             'Non éligible' => 'Non éligible',
             'Raison :' => 'Raison :',
             'Voir le tableau de bord' => 'Voir le tableau de bord',
+            'Produits exclus du droit de rétractation' => 'Produits exclus du droit de rétractation',
+            'IDs de produits séparés par des virgules (article L.221-28).' => 'IDs de produits séparés par des virgules (article L.221-28).',
+            'Catégories exclues du droit de rétractation' => 'Catégories exclues du droit de rétractation',
+            'IDs de catégories séparés par des virgules (article L.221-28).' => 'IDs de catégories séparés par des virgules (article L.221-28).',
         ];
 
         foreach (['ModulesRetractation2026Front' => $front, 'ModulesRetractation2026Admin' => $admin] as $domain => $strings) {

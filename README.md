@@ -4,13 +4,16 @@ Module PrestaShop 8+ pour gérer le droit de rétractation des consommateurs con
 
 ## Fonctionnalités
 
-- Calcul automatique de l’éligibilité sur 14 jours calendaires.
+- Calcul automatique du délai de rétractation (14 jours calendaires par défaut).
 - Cascade de dates : date de livraison → date d’expédition + buffer → date de commande + buffer.
-- Formulaire de rétractation pré-rempli pour les clients connectés, accessible aux invités par email + référence de commande.
+- Prise en compte de la dernière livraison pour les commandes en plusieurs envois.
+- Extension au premier jour ouvrable suivant si le dernier jour du délai est un samedi, dimanche ou jour férié métropolitain.
+- Formulaire de rétractation en ligne pré-rempli pour les clients connectés, accessible aux invités par email + référence de commande.
 - Historique des demandes dans le compte client.
 - Tableau de bord administrateur sous **Commandes > Rétractations**.
 - Panneau latéral sur la fiche commande admin.
-- Notices précontractuelles sur fiche produit et panier (désactivables).
+- Notices précontractuelles sur fiche produit et panier (désactivables), avec lien vers le formulaire.
+- Exclusions configurables par produits ou catégories (article L.221-28).
 - Emails de confirmation, d’acceptation, de refus et de notification marchand (FR + EN).
 - Support multiboutique.
 
@@ -18,15 +21,14 @@ Module PrestaShop 8+ pour gérer le droit de rétractation des consommateurs con
 
 - `retractation2026/` — le module PrestaShop proprement dit.
 - `docs/` — documentation utilisateur et guide juridique CGV.
-- `scripts/` — scripts de packaging et de vérification (build-zip, verify-s*).
 
-Les fichiers `package.json`, `node_modules/`, `scripts/generate-*.js`, `scripts/logo-output/` et `retractation2026.zip` ne font **pas partie du module** : ce sont des outils/outils graphiques de développement.
+Les outils de développement (scripts de build/verif, logo, `package.json`, `node_modules/`, `.mcp.json`, `.planning/`) ne sont **pas versionnés** : ils restent en local.
 
 ## Installation
 
 1. Téléchargez le ZIP `retractation2026.zip` (il ne contient que le dossier `retractation2026/`).
 2. Dans le Back Office PrestaShop : **Modules > Module Manager > Télécharger un module**.
-3. Configurez les délais et buffers sous **Configurer**.
+3. Configurez les délais, buffers et exclusions sous **Configurer**.
 
 Aucune modification manuelle de la base de données n’est requise.
 
@@ -42,6 +44,8 @@ Aucune modification manuelle de la base de données n’est requise.
 | `RETRACTATION_ADMIN_EMAIL_ENABLED` | Email de notification au marchand | 1 |
 | `RETRACTATION_SHOW_PRODUCT_NOTICE` | Notice sur fiche produit | 1 |
 | `RETRACTATION_SHOW_CART_NOTICE` | Notice dans le panier | 1 |
+| `RETRACTATION_EXCLUDED_PRODUCTS` | IDs de produits exclus du droit de rétractation | vide |
+| `RETRACTATION_EXCLUDED_CATEGORIES` | IDs de catégories exclues du droit de rétractation | vide |
 
 ## Hooks enregistrés
 
@@ -51,27 +55,23 @@ Aucune modification manuelle de la base de données n’est requise.
 - `displayProductAdditionalInfo`
 - `displayShoppingCartFooter`
 
-## Notes de version 1.0.1
+## Notes de version 1.1.0
 
-- Ajout du champ `reject_reason` dans l’ObjectModel.
-- Suppression de la contrainte d’unicité trop stricte qui bloquait une nouvelle demande après annulation.
-- Désinstallation sécurisée : les données sont archivées avec un horodatage au lieu d’être écrasées.
-- Suppression de l’insertion automatique dans le footer (couplage fragile avec `ps_linklist`).
-- Suppression du hook `displayHeader` inutilisé.
-- Correction de la documentation (hooks enregistrés).
-- Traductions complètes du panneau latéral admin.
-- Ajout de l’email de notification au marchand.
+- Extension du délai au jour ouvrable suivant en cas de samedi, dimanche ou jour férié.
+- Utilisation de la dernière date de livraison pour les commandes en plusieurs envois.
+- Ajout d’exclusions configurables par produit ou catégorie (L.221-28).
+- Enrichissement des notices précontractuelles (délai, point de départ, lien vers le formulaire).
 
 ## Mise en production / GitHub
 
-- Ne poussez que `docs/` et `retractation2026/` sur GitHub (les outils de dev sont exclus via `.gitignore`).
+- Ne poussez que `docs/` et `retractation2026/` sur GitHub (les outils de dev restent en local).
 - Le ZIP de release doit contenir uniquement le dossier `retractation2026/`.
 - Testez sur un PrestaShop 8+ avec PHP 7.4+ avant la production.
 - Pensez à mettre à jour vos CGV : voir `docs/guide-cgv.md`.
 
 ## Avertissement juridique
 
-Ce module aide à respecter le cadre légal du droit de rétractation mais ne constitue **pas un avis juridique**. Faites valider vos CGV et votre processus par un professionnel du droit.
+Ce module aide à respecter le cadre légal du droit de rétractation mais ne constitue **pas un avis juridique**. Faites valider vos CGV, mentions légales et processus par un professionnel du droit.
 
 ## Licence
 

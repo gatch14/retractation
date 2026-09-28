@@ -218,6 +218,22 @@
         <source>This order does not belong to your account.</source>
         <target>Cette commande n'appartient pas à votre compte.</target>
       </trans-unit>
+      <trans-unit id="b3c4d5e6f7000c01" resname="Withdrawal form">
+        <source>Withdrawal form</source>
+        <target>Formulaire de rétractation</target>
+      </trans-unit>
+      <trans-unit id="b3c4d5e6f7000c02" resname="In accordance with Article L.221-18 of the French Consumer Code, you have a right of withdrawal of 14 calendar days from receipt of this product.">
+        <source>In accordance with Article L.221-18 of the French Consumer Code, you have a right of withdrawal of 14 calendar days from receipt of this product.</source>
+        <target>Conformément à l'article L.221-18 du Code de la consommation, vous disposez d'un droit de rétractation de 14 jours calendaires à compter de la réception de ce produit.</target>
+      </trans-unit>
+      <trans-unit id="b3c4d5e6f7000c03" resname="This product is excluded from the right of withdrawal in accordance with Article L.221-28 of the French Consumer Code.">
+        <source>This product is excluded from the right of withdrawal in accordance with Article L.221-28 of the French Consumer Code.</source>
+        <target>Ce produit est exclu du droit de rétractation conformément à l'article L.221-28 du Code de la consommation.</target>
+      </trans-unit>
+      <trans-unit id="b3c4d5e6f7000c04" resname="In accordance with Article L.221-18 of the French Consumer Code, you have a right of withdrawal of 14 calendar days from receipt of your order. If the deadline expires on a Saturday, Sunday or public holiday, it is extended to the next working day.">
+        <source>In accordance with Article L.221-18 of the French Consumer Code, you have a right of withdrawal of 14 calendar days from receipt of your order. If the deadline expires on a Saturday, Sunday or public holiday, it is extended to the next working day.</source>
+        <target>Conformément à l'article L.221-18 du Code de la consommation, vous disposez d'un droit de rétractation de 14 jours calendaires à compter de la réception de votre commande. Si le délai expire un samedi, dimanche ou jour férié, il est prolongé jusqu'au premier jour ouvrable suivant.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

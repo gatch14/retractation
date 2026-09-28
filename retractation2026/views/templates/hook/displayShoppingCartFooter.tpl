@@ -3,12 +3,8 @@
     {if $retractation_cart_notice_text}
       {$retractation_cart_notice_text nofilter}
     {else}
-      {l s='In accordance with applicable consumer protection law, you have a right of withdrawal that you may exercise within the legal deadline after receiving your order.' mod='retractation2026'}<br>
-      {if $customer.is_logged}
-        {l s='You can submit your withdrawal request from the "My retractations" section of your customer account.' mod='retractation2026'}
-      {else}
-        {l s='You can submit your withdrawal request from our online withdrawal form.' mod='retractation2026'}
-      {/if}
+      {l s='In accordance with Article L.221-18 of the French Consumer Code, you have a right of withdrawal of 14 calendar days from receipt of your order. If the deadline expires on a Saturday, Sunday or public holiday, it is extended to the next working day.' mod='retractation2026'}<br>
+      <a href="{$retractation_form_url|escape:'htmlall':'UTF-8'}">{l s='Withdrawal form' mod='retractation2026'}</a>
     {/if}
   </p>
 </div>

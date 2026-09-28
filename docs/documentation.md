@@ -134,6 +134,17 @@ Le module prend en charge le multiboutique PrestaShop :
 | `displayProductAdditionalInfo` | Notice précontractuelle sur la fiche produit |
 | `displayShoppingCartFooter` | Notice précontractuelle dans le panier |
 
+## Traductions
+
+Les textes du module sont en anglais dans les templates et les contrôleurs (source), et traduits en français via le catalogue de traductions PrestaShop (XLF + base `ps_translation`).
+
+Pour régénérer le catalogue Symfony après une mise à jour du module :
+
+1. Videz le cache PrestaShop : **Configuration avancée > Performances > Vider le cache**.
+2. Régénérez les traductions françaises : **International > Traductions > Ajouter / Mettre à jour une langue** > choisissez **Français (French)**.
+
+Alternativement, vous pouvez supprimer manuellement le dossier `var/cache/prod/translations/` (et `dev/translations/` si vous êtes en mode debug) sur le serveur, puis recharger une page front-office pour forcer la recompilation.
+
 ## Contexte juridique
 
 Ce module met en œuvre le droit de rétractation tel que défini par l’**Ordonnance n° 2026-2**, qui renforce les articles **L.221-18 à L.221-28 du Code de la consommation**.

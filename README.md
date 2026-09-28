@@ -55,6 +55,12 @@ Aucune modification manuelle de la base de données n’est requise.
 - `displayProductAdditionalInfo`
 - `displayShoppingCartFooter`
 
+## Notes de version 1.1.3
+
+- Retour aux textes source en anglais pour les notices fiche produit et panier.
+- Traductions françaises fournies via le catalogue PrestaShop (XLF + `ps_translation`).
+- Vidage agressif du cache Symfony lors de la mise à jour pour forcer la recompilation des traductions.
+
 ## Notes de version 1.1.0
 
 - Extension du délai au jour ouvrable suivant en cas de samedi, dimanche ou jour férié.

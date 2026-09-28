@@ -55,7 +55,7 @@ class Retractation2026 extends Module
     {
         $this->name = 'retractation2026';
         $this->tab = 'legal_compliance';
-        $this->version = '1.1.0';
+        $this->version = '1.1.3';
         $this->author = 'Christophe Gatelet';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
@@ -505,7 +505,7 @@ class Retractation2026 extends Module
         return $helper->generateForm([$fields_form]);
     }
 
-    private function installTranslations()
+    public function installTranslations()
     {
         $idLang = (int) Language::getIdByIso('fr');
         if (!$idLang) {
@@ -513,7 +513,7 @@ class Retractation2026 extends Module
         }
 
         $db = Db::getInstance();
-        $domains = ['ModulesRetractation2026Front', 'ModulesRetractation2026Admin'];
+        $domains = ['Modules.Retractation2026.Front', 'Modules.Retractation2026.Admin'];
         foreach ($domains as $domain) {
             $db->execute(
                 'DELETE FROM `' . _DB_PREFIX_ . 'translation`
@@ -653,7 +653,7 @@ class Retractation2026 extends Module
             'IDs de catégories séparés par des virgules (article L.221-28).' => 'IDs de catégories séparés par des virgules (article L.221-28).',
         ];
 
-        foreach (['ModulesRetractation2026Front' => $front, 'ModulesRetractation2026Admin' => $admin] as $domain => $strings) {
+        foreach (['Modules.Retractation2026.Front' => $front, 'Modules.Retractation2026.Admin' => $admin] as $domain => $strings) {
             foreach ($strings as $key => $translation) {
                 $db->execute(
                     'INSERT INTO `' . _DB_PREFIX_ . 'translation` (id_lang, `key`, translation, domain, theme)

@@ -76,6 +76,11 @@ class Retractation2026 extends Module
         );
     }
 
+    public function isUsingNewTranslationSystem()
+    {
+        return true;
+    }
+
     public function install()
     {
         Shop::setContext(Shop::CONTEXT_ALL);

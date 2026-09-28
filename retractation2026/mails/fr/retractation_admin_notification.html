@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle demande de rétractation</title>
+  <style>
+    body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, Helvetica, sans-serif; }
+    .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+    .header { background-color: #2c3e50; color: #ffffff; padding: 20px 30px; text-align: center; }
+    .header h1 { margin: 0; font-size: 22px; }
+    .content { padding: 30px; color: #333333; line-height: 1.6; }
+    .content h2 { color: #2c3e50; font-size: 18px; margin-top: 0; }
+    .details { background-color: #f9f9f9; border: 1px solid #e0e0e0; border-radius: 4px; padding: 20px; margin: 20px 0; }
+    .details table { width: 100%; border-collapse: collapse; }
+    .details td { padding: 8px 0; vertical-align: top; }
+    .details td.label { font-weight: bold; width: 200px; color: #555555; }
+    .footer { background-color: #f4f4f4; padding: 20px 30px; font-size: 12px; color: #888888; text-align: center; border-top: 1px solid #e0e0e0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Nouvelle demande de rétractation</h1>
+    </div>
+    <div class="content">
+      <p>Une nouvelle demande de rétractation a été soumise.</p>
+
+      <div class="details">
+        <h2>Détails de la demande</h2>
+        <table>
+          <tr>
+            <td class="label">Référence de commande :</td>
+            <td>{order_reference}</td>
+          </tr>
+          <tr>
+            <td class="label">Client :</td>
+            <td>{firstname} {lastname}</td>
+          </tr>
+          <tr>
+            <td class="label">Email client :</td>
+            <td>{customer_email}</td>
+          </tr>
+          <tr>
+            <td class="label">Date de rétractation :</td>
+            <td>{retractation_date}</td>
+          </tr>
+          <tr>
+            <td class="label">Heure de rétractation :</td>
+            <td>{retractation_time}</td>
+          </tr>
+          <tr>
+            <td class="label">Date limite :</td>
+            <td>{deadline_date}</td>
+          </tr>
+          <tr>
+            <td class="label">Source du calcul :</td>
+            <td>{deadline_source}</td>
+          </tr>
+          <tr>
+            <td class="label">Motif :</td>
+            <td>{reason}</td>
+          </tr>
+        </table>
+      </div>
+
+      <p>Connectez-vous au back-office pour traiter cette demande.</p>
+
+      <p>Cordialement,<br>{shop_name}</p>
+    </div>
+    <div class="footer">
+      <p>Ce message a été envoyé automatiquement par <a href="{shop_url}">{shop_name}</a>.</p>
+    </div>
+  </div>
+</body>
+</html>

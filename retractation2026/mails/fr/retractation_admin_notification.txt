@@ -1,0 +1,23 @@
+Nouvelle demande de rétractation
+=================================
+
+Une nouvelle demande de rétractation a été soumise.
+
+Détails de la demande
+---------------------
+Référence de commande : {order_reference}
+Client : {firstname} {lastname}
+Email client : {customer_email}
+Date de rétractation : {retractation_date}
+Heure de rétractation : {retractation_time}
+Date limite : {deadline_date}
+Source du calcul : {deadline_source}
+Motif : {reason}
+
+Connectez-vous au back-office pour traiter cette demande.
+
+Cordialement,
+{shop_name}
+
+--
+Ce message a été envoyé automatiquement par {shop_name} ({shop_url}).

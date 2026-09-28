@@ -28,3 +28,13 @@ vendor/
 coverage/
 .cache/
 tmp/
+
+# ── Project dev artifacts (not part of the PrestaShop module) ──
+.claude/
+package.json
+package-lock.json
+scripts/generate-*.js
+scripts/process-logo.js
+scripts/logo-output/
+scripts/seed-test-orders.sql
+retractation2026.zip

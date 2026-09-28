@@ -2,7 +2,7 @@
 <module>
   <name>retractation2026</name>
   <displayName><![CDATA[Rétractation 2026]]></displayName>
-  <version><![CDATA[1.0.0]]></version>
+  <version><![CDATA[1.0.1]]></version>
   <description><![CDATA[Gestion du droit de rétractation pour les commandes e-commerce, conforme à la législation française 2026.]]></description>
   <author><![CDATA[GSD]]></author>
   <tab><![CDATA[legal_compliance]]></tab>

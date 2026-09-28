@@ -111,10 +111,8 @@ The module fully supports PrestaShop's multistore feature:
 | `displayOrderDetail` | Show withdrawal button on order detail |
 | `displayCustomerAccount` | Add retractation history link in customer account |
 | `displayAdminOrderSide` | Show retractation panel in admin order view |
-| `actionOrderStatusPostUpdate` | Track order status changes for deadline calculation |
 | `displayProductAdditionalInfo` | Precontractual notice on product page |
 | `displayShoppingCartFooter` | Precontractual notice in cart |
-| `displayHeader` | Load front-office CSS/JS assets |
 
 ## Legal Context
 

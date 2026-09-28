@@ -1,0 +1,23 @@
+New retractation request
+========================
+
+A new retractation request has been submitted.
+
+Request details
+---------------
+Order reference: {order_reference}
+Customer: {firstname} {lastname}
+Customer email: {customer_email}
+Retractation date: {retractation_date}
+Retractation time: {retractation_time}
+Deadline: {deadline_date}
+Deadline source: {deadline_source}
+Reason: {reason}
+
+Please log in to the back office to process this request.
+
+Best regards,
+{shop_name}
+
+--
+This message was sent automatically by {shop_name} ({shop_url}).

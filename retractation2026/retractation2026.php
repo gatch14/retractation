@@ -21,6 +21,7 @@ class Retractation2026 extends Module
         'RETRACTATION_SHOW_CART_NOTICE',
         'RETRACTATION_PRODUCT_NOTICE_TEXT',
         'RETRACTATION_CART_NOTICE_TEXT',
+        'RETRACTATION_ADMIN_EMAIL_ENABLED',
     ];
 
     const CONFIG_DEFAULTS = [
@@ -33,6 +34,7 @@ class Retractation2026 extends Module
         'RETRACTATION_SHOW_CART_NOTICE' => 1,
         'RETRACTATION_PRODUCT_NOTICE_TEXT' => '',
         'RETRACTATION_CART_NOTICE_TEXT' => '',
+        'RETRACTATION_ADMIN_EMAIL_ENABLED' => 1,
     ];
 
     const HOOKS = [
@@ -41,14 +43,13 @@ class Retractation2026 extends Module
         'displayAdminOrderSide',
         'displayProductAdditionalInfo',
         'displayShoppingCartFooter',
-        'displayHeader',
     ];
 
     public function __construct()
     {
         $this->name = 'retractation2026';
         $this->tab = 'legal_compliance';
-        $this->version = '1.0.0';
+        $this->version = '1.0.1';
         $this->author = 'GSD';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
@@ -88,6 +89,7 @@ class Retractation2026 extends Module
         Configuration::updateValue('RETRACTATION_SHOW_CART_NOTICE', 1);
         Configuration::updateValue('RETRACTATION_PRODUCT_NOTICE_TEXT', '', true);
         Configuration::updateValue('RETRACTATION_CART_NOTICE_TEXT', '', true);
+        Configuration::updateValue('RETRACTATION_ADMIN_EMAIL_ENABLED', 1);
 
         $tab = new Tab();
         $tab->class_name = 'AdminRetractationDashboard';
@@ -102,15 +104,13 @@ class Retractation2026 extends Module
         }
 
         $this->installMeta();
-        $this->installFooterLink();
 
         return parent::install()
             && $this->registerHook('displayOrderDetail')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('displayAdminOrderSide')
             && $this->registerHook('displayProductAdditionalInfo')
-            && $this->registerHook('displayShoppingCartFooter')
-            && $this->registerHook('displayHeader');
+            && $this->registerHook('displayShoppingCartFooter');
     }
 
     private function installMeta()
@@ -151,95 +151,17 @@ class Retractation2026 extends Module
         }
     }
 
-    private function installFooterLink()
-    {
-        $url = $this->context->link->getModuleLink($this->name, 'request', [], true);
-        $db = Db::getInstance();
-
-        $idBlock = (int) $db->getValue(
-            'SELECT lb.id_link_block FROM `' . _DB_PREFIX_ . 'link_block` lb
-            JOIN `' . _DB_PREFIX_ . 'link_block_lang` lbl ON lb.id_link_block = lbl.id_link_block
-            WHERE lb.id_hook = (SELECT id_hook FROM `' . _DB_PREFIX_ . 'hook` WHERE name = \'displayFooter\' LIMIT 1)
-            ORDER BY lb.position DESC LIMIT 1'
-        );
-
-        if (!$idBlock) {
-            return;
-        }
-
-        $languages = Language::getLanguages(true);
-        foreach ($languages as $lang) {
-            $idLang = (int) $lang['id_lang'];
-            $title = ($lang['iso_code'] === 'fr') ? 'Droit de rétractation' : 'Right of withdrawal';
-
-            $existing = $db->getValue(
-                'SELECT custom_content FROM `' . _DB_PREFIX_ . 'link_block_lang`
-                WHERE id_link_block = ' . $idBlock . ' AND id_lang = ' . $idLang
-            );
-
-            $links = [];
-            if ($existing) {
-                $decoded = json_decode($existing, true);
-                if (is_array($decoded)) {
-                    $links = $decoded;
-                }
-            }
-
-            foreach ($links as $link) {
-                if (isset($link['url']) && strpos($link['url'], 'retractation') !== false) {
-                    continue 2;
-                }
-            }
-
-            $links[] = ['title' => $title, 'url' => $url];
-
-            $db->execute(
-                'UPDATE `' . _DB_PREFIX_ . 'link_block_lang`
-                SET custom_content = \'' . pSQL(json_encode($links)) . '\'
-                WHERE id_link_block = ' . $idBlock . ' AND id_lang = ' . $idLang
-            );
-        }
-    }
-
-    private function uninstallFooterLink()
-    {
-        $db = Db::getInstance();
-
-        $rows = $db->executeS(
-            'SELECT id_link_block, id_lang, custom_content FROM `' . _DB_PREFIX_ . 'link_block_lang`
-            WHERE custom_content IS NOT NULL AND custom_content != \'\''
-        );
-
-        if (!$rows) {
-            return;
-        }
-
-        foreach ($rows as $row) {
-            $links = json_decode($row['custom_content'], true);
-            if (!is_array($links)) {
-                continue;
-            }
-
-            $filtered = array_values(array_filter($links, function ($link) {
-                return !isset($link['url']) || strpos($link['url'], 'retractation') === false;
-            }));
-
-            $value = empty($filtered) ? 'NULL' : '\'' . pSQL(json_encode($filtered)) . '\'';
-            $db->execute(
-                'UPDATE `' . _DB_PREFIX_ . 'link_block_lang`
-                SET custom_content = ' . $value . '
-                WHERE id_link_block = ' . (int) $row['id_link_block'] . '
-                AND id_lang = ' . (int) $row['id_lang']
-            );
-        }
-    }
-
     public function uninstall()
     {
         // CR-08: archive records instead of dropping (legal evidentiary value)
+        // Keep previous archives by renaming with a timestamp.
         $db = Db::getInstance();
-        $db->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'retractation_archived`');
-        $db->execute('RENAME TABLE `' . _DB_PREFIX_ . 'retractation` TO `' . _DB_PREFIX_ . 'retractation_archived`');
+        $table = '`' . _DB_PREFIX_ . 'retractation`';
+        $exists = (bool) $db->getValue('SHOW TABLES LIKE \'' . pSQL(_DB_PREFIX_ . 'retractation') . '\'');
+        if ($exists) {
+            $archiveName = '`' . _DB_PREFIX_ . 'retractation_archived_' . date('YmdHis') . '`';
+            $db->execute('RENAME TABLE ' . $table . ' TO ' . $archiveName);
+        }
 
         $idTab = (int) Tab::getIdFromClassName('AdminRetractationDashboard');
         if ($idTab) {
@@ -248,17 +170,10 @@ class Retractation2026 extends Module
         }
 
         $this->uninstallMeta();
-        $this->uninstallFooterLink();
 
-        Configuration::deleteByName('RETRACTATION_DELAY_DAYS');
-        Configuration::deleteByName('RETRACTATION_BUFFER_SHIPPED');
-        Configuration::deleteByName('RETRACTATION_BUFFER_ORDER');
-        Configuration::deleteByName('RETRACTATION_ENABLED');
-        Configuration::deleteByName('RETRACTATION_EMAIL_ENABLED');
-        Configuration::deleteByName('RETRACTATION_SHOW_PRODUCT_NOTICE');
-        Configuration::deleteByName('RETRACTATION_SHOW_CART_NOTICE');
-        Configuration::deleteByName('RETRACTATION_PRODUCT_NOTICE_TEXT');
-        Configuration::deleteByName('RETRACTATION_CART_NOTICE_TEXT');
+        foreach (self::CONFIG_KEYS as $key) {
+            Configuration::deleteByName($key);
+        }
 
         return parent::uninstall();
     }
@@ -271,6 +186,7 @@ class Retractation2026 extends Module
             Configuration::updateValue('RETRACTATION_BUFFER_ORDER', (int) Tools::getValue('RETRACTATION_BUFFER_ORDER'));
             Configuration::updateValue('RETRACTATION_ENABLED', (bool) Tools::getValue('RETRACTATION_ENABLED'));
             Configuration::updateValue('RETRACTATION_EMAIL_ENABLED', (bool) Tools::getValue('RETRACTATION_EMAIL_ENABLED'));
+            Configuration::updateValue('RETRACTATION_ADMIN_EMAIL_ENABLED', (bool) Tools::getValue('RETRACTATION_ADMIN_EMAIL_ENABLED'));
             Configuration::updateValue('RETRACTATION_SHOW_PRODUCT_NOTICE', (bool) Tools::getValue('RETRACTATION_SHOW_PRODUCT_NOTICE'));
             Configuration::updateValue('RETRACTATION_SHOW_CART_NOTICE', (bool) Tools::getValue('RETRACTATION_SHOW_CART_NOTICE'));
             Configuration::updateValue('RETRACTATION_PRODUCT_NOTICE_TEXT', Tools::getValue('RETRACTATION_PRODUCT_NOTICE_TEXT'), true);
@@ -341,6 +257,20 @@ class Retractation2026 extends Module
             'retractation_request' => $request ?: null,
             'retractation_eligibility' => $eligibility,
             'retractation_module_link' => $this->context->link->getAdminLink('AdminRetractationDashboard'),
+            'retractation_labels' => [
+                'title' => $this->trans('Rétractation', [], 'Modules.Retractation2026.Admin'),
+                'status' => $this->trans('Statut :', [], 'Modules.Retractation2026.Admin'),
+                'pending' => $this->trans('En attente', [], 'Modules.Retractation2026.Admin'),
+                'accepted' => $this->trans('Acceptée', [], 'Modules.Retractation2026.Admin'),
+                'rejected' => $this->trans('Refusée', [], 'Modules.Retractation2026.Admin'),
+                'retractation_date' => $this->trans('Date de rétractation :', [], 'Modules.Retractation2026.Admin'),
+                'deadline' => $this->trans('Date limite :', [], 'Modules.Retractation2026.Admin'),
+                'source' => $this->trans('Source :', [], 'Modules.Retractation2026.Admin'),
+                'eligible' => $this->trans('Éligible', [], 'Modules.Retractation2026.Admin'),
+                'not_eligible' => $this->trans('Non éligible', [], 'Modules.Retractation2026.Admin'),
+                'reason' => $this->trans('Raison :', [], 'Modules.Retractation2026.Admin'),
+                'dashboard' => $this->trans('Voir le tableau de bord', [], 'Modules.Retractation2026.Admin'),
+            ],
         ]);
 
         return $this->display(__FILE__, 'views/templates/hook/admin_order_side.tpl');
@@ -436,6 +366,16 @@ class Retractation2026 extends Module
                     ],
                     [
                         'type' => 'switch',
+                        'label' => $this->trans('Notifier le marchand par email', [], 'Modules.Retractation2026.Admin'),
+                        'name' => 'RETRACTATION_ADMIN_EMAIL_ENABLED',
+                        'desc' => $this->trans('Envoyer un email de notification à l\'adresse de la boutique lors d\'une nouvelle demande.', [], 'Modules.Retractation2026.Admin'),
+                        'values' => [
+                            ['id' => 'admin_email_on', 'value' => 1, 'label' => $this->trans('Oui', [], 'Modules.Retractation2026.Admin')],
+                            ['id' => 'admin_email_off', 'value' => 0, 'label' => $this->trans('Non', [], 'Modules.Retractation2026.Admin')],
+                        ],
+                    ],
+                    [
+                        'type' => 'switch',
                         'label' => $this->trans('Afficher la notice sur les fiches produit', [], 'Modules.Retractation2026.Admin'),
                         'name' => 'RETRACTATION_SHOW_PRODUCT_NOTICE',
                         'desc' => $this->trans('Masquer pour les produits dématérialisés ou si vous gérez la notice via le thème', [], 'Modules.Retractation2026.Admin'),
@@ -494,6 +434,7 @@ class Retractation2026 extends Module
         $helper->fields_value['RETRACTATION_BUFFER_ORDER'] = Configuration::get('RETRACTATION_BUFFER_ORDER');
         $helper->fields_value['RETRACTATION_ENABLED'] = Configuration::get('RETRACTATION_ENABLED');
         $helper->fields_value['RETRACTATION_EMAIL_ENABLED'] = Configuration::get('RETRACTATION_EMAIL_ENABLED');
+        $helper->fields_value['RETRACTATION_ADMIN_EMAIL_ENABLED'] = Configuration::get('RETRACTATION_ADMIN_EMAIL_ENABLED');
         $helper->fields_value['RETRACTATION_SHOW_PRODUCT_NOTICE'] = Configuration::get('RETRACTATION_SHOW_PRODUCT_NOTICE');
         $helper->fields_value['RETRACTATION_SHOW_CART_NOTICE'] = Configuration::get('RETRACTATION_SHOW_CART_NOTICE');
         $helper->fields_value['RETRACTATION_PRODUCT_NOTICE_TEXT'] = Configuration::get('RETRACTATION_PRODUCT_NOTICE_TEXT');
@@ -574,6 +515,7 @@ class Retractation2026 extends Module
             'A retractation request already exists for this order.' => 'Une demande de rétractation existe déjà pour cette commande.',
             'This order does not belong to your account.' => 'Cette commande n\'appartient pas à votre compte.',
             'Confirmation of your retractation — Order %s' => 'Confirmation de votre rétractation — Commande %s',
+            'New retractation request — Order %s' => 'Nouvelle demande de rétractation — Commande %s',
         ];
 
         $admin = [
@@ -602,6 +544,28 @@ class Retractation2026 extends Module
             'Please enter a rejection reason.' => 'Veuillez saisir un motif de refus.',
             'Rejection reason' => 'Motif de refus',
             'Customer reason' => 'Motif du client',
+            'Back to list' => 'Retour à la liste',
+            'Retractation not found.' => 'Rétractation non trouvée.',
+            'Retractation requests' => 'Demandes de rétractation',
+            'Invalid status.' => 'Statut invalide.',
+            'Could not update status.' => 'Impossible de mettre à jour le statut.',
+            'Your retractation has been accepted' => 'Votre demande de rétractation a été acceptée',
+            'Your retractation has been rejected' => 'Votre demande de rétractation a été refusée',
+            'Email notification could not be sent.' => 'L\'email de notification n\'a pas pu être envoyé.',
+            'Notifier le marchand par email' => 'Notifier le marchand par email',
+            'Envoyer un email de notification à l\'adresse de la boutique lors d\'une nouvelle demande.' => 'Envoyer un email de notification à l\'adresse de la boutique lors d\'une nouvelle demande.',
+            'Rétractation' => 'Rétractation',
+            'Statut :' => 'Statut :',
+            'En attente' => 'En attente',
+            'Acceptée' => 'Acceptée',
+            'Refusée' => 'Refusée',
+            'Date de rétractation :' => 'Date de rétractation :',
+            'Date limite :' => 'Date limite :',
+            'Source :' => 'Source :',
+            'Éligible' => 'Éligible',
+            'Non éligible' => 'Non éligible',
+            'Raison :' => 'Raison :',
+            'Voir le tableau de bord' => 'Voir le tableau de bord',
         ];
 
         foreach (['ModulesRetractation2026Front' => $front, 'ModulesRetractation2026Admin' => $admin] as $domain => $strings) {

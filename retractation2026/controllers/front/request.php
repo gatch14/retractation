@@ -226,6 +226,40 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
             );
         }
 
+        // WR-06: notify merchant on new retractation request
+        if (Configuration::get('RETRACTATION_ADMIN_EMAIL_ENABLED')) {
+            $shopEmail = Configuration::get('PS_SHOP_EMAIL');
+            if (!empty($shopEmail) && Validate::isEmail($shopEmail)) {
+                $adminVars = [
+                    '{firstname}' => $customer->firstname,
+                    '{lastname}' => $customer->lastname,
+                    '{customer_email}' => $customer->email,
+                    '{order_reference}' => $order->reference,
+                    '{retractation_date}' => Tools::displayDate($now, null, false),
+                    '{retractation_time}' => date('H:i:s', strtotime($now)),
+                    '{reason}' => htmlspecialchars($reason, ENT_QUOTES, 'UTF-8'),
+                    '{deadline_date}' => Tools::displayDate($eligibility['deadline'], null, false),
+                    '{deadline_source}' => $eligibility['source'],
+                    '{shop_name}' => Configuration::get('PS_SHOP_NAME'),
+                    '{shop_url}' => Tools::getShopDomainSsl(true),
+                ];
+
+                Mail::Send(
+                    (int) $this->context->language->id,
+                    'retractation_admin_notification',
+                    $this->trans('New retractation request — Order %s', [$order->reference], 'Modules.Retractation2026.Front'),
+                    $adminVars,
+                    $shopEmail,
+                    Configuration::get('PS_SHOP_NAME'),
+                    null,
+                    null,
+                    null,
+                    null,
+                    _PS_MODULE_DIR_ . 'retractation2026/mails/'
+                );
+            }
+        }
+
         $this->retractationData = [
             'retractation_date' => Tools::displayDate($now, null, false),
             'retractation_time' => date('H:i:s', strtotime($now)),

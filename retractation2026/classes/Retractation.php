@@ -16,6 +16,7 @@ class Retractation extends ObjectModel
     public $id_customer;
     public $id_shop;
     public $reason;
+    public $reject_reason;
     public $status;
     public $retractation_date;
     public $deadline_date;
@@ -32,6 +33,7 @@ class Retractation extends ObjectModel
             'id_customer' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true],
             'id_shop' => ['type' => self::TYPE_INT, 'validate' => 'isUnsignedId', 'required' => true],
             'reason' => ['type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'],
+            'reject_reason' => ['type' => self::TYPE_HTML, 'validate' => 'isCleanHtml'],
             'status' => ['type' => self::TYPE_STRING, 'validate' => 'isGenericName', 'required' => true],
             'retractation_date' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],
             'deadline_date' => ['type' => self::TYPE_DATE, 'validate' => 'isDate'],

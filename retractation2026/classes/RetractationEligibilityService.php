@@ -182,7 +182,7 @@ class RetractationEligibilityService
      */
     private function getFrenchHolidays(int $year): array
     {
-        $easter = new DateTimeImmutable('@' . easter_date($year));
+        $easter = $this->getEasterDate($year);
 
         $dates = [
             $easter->modify('+1 day')->format('Y-m-d'),      // Lundi de Pâques
@@ -199,6 +199,30 @@ class RetractationEligibilityService
         ];
 
         return $dates;
+    }
+
+    /**
+     * Compute Easter Sunday using Gauss's algorithm (Gregorian calendar).
+     * This avoids relying on the optional PHP calendar extension.
+     */
+    private function getEasterDate(int $year): DateTimeImmutable
+    {
+        $a = $year % 19;
+        $b = (int) ($year / 100);
+        $c = $year % 100;
+        $d = (int) ($b / 4);
+        $e = $b % 4;
+        $f = (int) (($b + 8) / 25);
+        $g = (int) (($b - $f + 1) / 3);
+        $h = (19 * $a + $b - $d - $g + 15) % 30;
+        $i = (int) ($c / 4);
+        $k = $c % 4;
+        $l = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
+        $m = (int) (($a + 11 * $h + 22 * $l) / 451);
+        $month = (int) (($h + $l - 7 * $m + 114) / 31); // 3 = March, 4 = April
+        $day = (($h + $l - 7 * $m + 114) % 31) + 1;
+
+        return new DateTimeImmutable("$year-$month-$day");
     }
 
     private function ineligible(string $reason): array

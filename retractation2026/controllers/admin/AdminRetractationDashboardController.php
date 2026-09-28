@@ -1,7 +1,7 @@
 <?php
 /**
- * @author    GSD
- * @copyright GSD
+ * @author    Christophe Gatelet
+ * @copyright Christophe Gatelet
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
 

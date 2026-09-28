@@ -4,7 +4,7 @@
   <displayName><![CDATA[Rétractation 2026]]></displayName>
   <version><![CDATA[1.1.0]]></version>
   <description><![CDATA[Gestion du droit de rétractation pour les commandes e-commerce, conforme à la législation française 2026.]]></description>
-  <author><![CDATA[GSD]]></author>
+  <author><![CDATA[Christophe Gatelet]]></author>
   <tab><![CDATA[legal_compliance]]></tab>
   <confirmUninstall><![CDATA[Êtes-vous sûr de vouloir désinstaller ce module ? Toutes les données de rétractation seront perdues.]]></confirmUninstall>
   <is_configurable>1</is_configurable>

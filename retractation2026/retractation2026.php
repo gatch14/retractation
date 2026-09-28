@@ -1,7 +1,7 @@
 <?php
 /**
- * @author    GSD
- * @copyright GSD
+ * @author    Christophe Gatelet
+ * @copyright Christophe Gatelet
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
 
@@ -56,7 +56,7 @@ class Retractation2026 extends Module
         $this->name = 'retractation2026';
         $this->tab = 'legal_compliance';
         $this->version = '1.1.0';
-        $this->author = 'GSD';
+        $this->author = 'Christophe Gatelet';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => '9.99.99'];
         $this->bootstrap = true;

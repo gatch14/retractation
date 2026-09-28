@@ -22,12 +22,12 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         $reference = trim(Tools::getValue('lookup_reference'));
 
         if (empty($email) || empty($reference)) {
-            $this->errors[] = $this->trans('Please provide your email and order reference.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('Please provide your email and order reference.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
         if (!Validate::isEmail($email)) {
-            $this->errors[] = $this->trans('Invalid email address.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('Invalid email address.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
@@ -39,7 +39,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         );
 
         if ($idOrder <= 0) {
-            $this->errors[] = $this->trans('No order found with this reference and email.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('No order found with this reference and email.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
@@ -50,19 +50,19 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
     {
         $idOrder = (int) Tools::getValue('id_order');
         if ($idOrder <= 0) {
-            $this->errors[] = $this->trans('Invalid order.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('Invalid order.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
         $order = new Order($idOrder);
         if (!Validate::isLoadedObject($order)) {
-            $this->errors[] = $this->trans('Order not found.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('Order not found.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
         if ($this->context->customer->isLogged()) {
             if ((int) $order->id_customer !== (int) $this->context->customer->id) {
-                $this->errors[] = $this->trans('You do not have permission to access this order.', [], 'Modules.Retractation2026.Front');
+                $this->errors[] = $this->trans('You do not have permission to access this order.', [], 'Modules.Retractation2026.Shop');
                 return null;
             }
             return $order;
@@ -73,23 +73,23 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         $orderReference = Tools::getValue('order_reference');
 
         if (empty($guestEmail) || empty($orderReference)) {
-            $this->errors[] = $this->trans('Please provide your email and order reference.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('Please provide your email and order reference.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
         if (!Validate::isEmail($guestEmail)) {
-            $this->errors[] = $this->trans('Invalid email address.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('Invalid email address.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
         if ($order->reference !== $orderReference) {
-            $this->errors[] = $this->trans('You do not have permission to access this order.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('You do not have permission to access this order.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
         $customer = new Customer((int) $order->id_customer);
         if (!Validate::isLoadedObject($customer) || $customer->email !== $guestEmail) {
-            $this->errors[] = $this->trans('You do not have permission to access this order.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('You do not have permission to access this order.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
@@ -116,7 +116,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         $eligibility = $service->getEligibility((int) $order->id);
 
         if (!$eligibility['eligible']) {
-            $this->errors[] = $this->trans('This order is not eligible for retractation.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('This order is not eligible for retractation.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
@@ -127,7 +127,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                AND status != \'cancelled\''
         );
         if ($existing) {
-            $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Shop');
             return null;
         }
 
@@ -155,7 +155,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         // CR-01: verify nonce (single-use, consumed on success)
         $nonce = $this->context->cookie->retractation_nonce;
         if (!$nonce || Tools::getValue('retractation_token') !== $nonce) {
-            $this->errors[] = $this->trans('Invalid security token. Please try again.', [], 'Modules.Retractation2026.Front');
+            $this->errors[] = $this->trans('Invalid security token. Please try again.', [], 'Modules.Retractation2026.Shop');
             return;
         }
         $this->context->cookie->retractation_nonce = false;
@@ -194,9 +194,9 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
         if (!$inserted) {
             $dbError = Db::getInstance()->getMsgError();
             if (stripos($dbError, 'Duplicate') !== false || stripos($dbError, '1062') !== false) {
-                $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Front');
+                $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Shop');
             } else {
-                $this->errors[] = $this->trans('An error occurred while processing your request. Please try again.', [], 'Modules.Retractation2026.Front');
+                $this->errors[] = $this->trans('An error occurred while processing your request. Please try again.', [], 'Modules.Retractation2026.Shop');
             }
             return;
         }
@@ -218,7 +218,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
             Mail::Send(
                 (int) $this->context->language->id,
                 'retractation_confirmation',
-                $this->trans('Confirmation of your retractation — Order %s', [$order->reference], 'Modules.Retractation2026.Front'),
+                $this->trans('Confirmation of your retractation — Order %s', [$order->reference], 'Modules.Retractation2026.Shop'),
                 $templateVars,
                 $customer->email,
                 $customer->firstname . ' ' . $customer->lastname,
@@ -251,7 +251,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                 Mail::Send(
                     (int) $this->context->language->id,
                     'retractation_admin_notification',
-                    $this->trans('New retractation request — Order %s', [$order->reference], 'Modules.Retractation2026.Front'),
+                    $this->trans('New retractation request — Order %s', [$order->reference], 'Modules.Retractation2026.Shop'),
                     $adminVars,
                     $shopEmail,
                     Configuration::get('PS_SHOP_NAME'),
@@ -288,7 +288,7 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
                 if ($this->context->customer->isLogged()
                     && (int) $order->id_customer !== (int) $this->context->customer->id
                 ) {
-                    $this->errors[] = $this->trans('This order does not belong to your account.', [], 'Modules.Retractation2026.Front');
+                    $this->errors[] = $this->trans('This order does not belong to your account.', [], 'Modules.Retractation2026.Shop');
                     $this->context->smarty->assign(['show_lookup' => true]);
                     $this->setTemplate('module:retractation2026/views/templates/front/request.tpl');
                     return;

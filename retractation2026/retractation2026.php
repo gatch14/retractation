@@ -518,7 +518,13 @@ class Retractation2026 extends Module
         }
 
         $db = Db::getInstance();
-        $domains = ['Modules.Retractation2026.Front', 'Modules.Retractation2026.Admin'];
+        $domains = [
+            'Modules.Retractation2026.Shop',
+            'Modules.Retractation2026.Front',
+            'Modules.Retractation2026.Admin',
+            'ModulesRetractation2026Front',
+            'ModulesRetractation2026Admin',
+        ];
         foreach ($domains as $domain) {
             $db->execute(
                 'DELETE FROM `' . _DB_PREFIX_ . 'translation`
@@ -658,7 +664,7 @@ class Retractation2026 extends Module
             'IDs de catégories séparés par des virgules (article L.221-28).' => 'IDs de catégories séparés par des virgules (article L.221-28).',
         ];
 
-        foreach (['Modules.Retractation2026.Front' => $front, 'Modules.Retractation2026.Admin' => $admin] as $domain => $strings) {
+        foreach (['Modules.Retractation2026.Shop' => $front, 'Modules.Retractation2026.Admin' => $admin] as $domain => $strings) {
             foreach ($strings as $key => $translation) {
                 $db->execute(
                     'INSERT INTO `' . _DB_PREFIX_ . 'translation` (id_lang, `key`, translation, domain, theme)

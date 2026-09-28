@@ -9,8 +9,6 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
-require_once _PS_MODULE_DIR_ . 'retractation2026/classes/Retractation.php';
-
 class AdminRetractationDashboardController extends ModuleAdminController
 {
     public function __construct()
@@ -34,51 +32,51 @@ class AdminRetractationDashboardController extends ModuleAdminController
         parent::__construct();
 
         $statusList = [
-            'pending' => $this->module->l('Pending', 'AdminRetractationDashboardController'),
-            'accepted' => $this->module->l('Accepted', 'AdminRetractationDashboardController'),
-            'rejected' => $this->module->l('Rejected', 'AdminRetractationDashboardController'),
-            'cancelled' => $this->module->l('Cancelled', 'AdminRetractationDashboardController'),
+            'pending' => $this->trans('Pending', [], 'Modules.Retractation2026.Admin'),
+            'accepted' => $this->trans('Accepted', [], 'Modules.Retractation2026.Admin'),
+            'rejected' => $this->trans('Rejected', [], 'Modules.Retractation2026.Admin'),
+            'cancelled' => $this->trans('Cancelled', [], 'Modules.Retractation2026.Admin'),
         ];
 
         $this->fields_list = [
             'id_retractation' => [
-                'title' => $this->module->l('ID', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('ID', [], 'Modules.Retractation2026.Admin'),
                 'align' => 'center',
                 'class' => 'fixed-width-xs',
             ],
             'order_reference' => [
-                'title' => $this->module->l('Order', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('Order', [], 'Modules.Retractation2026.Admin'),
                 'filter_key' => 'o!reference',
                 'havingFilter' => false,
             ],
             'customer_name' => [
-                'title' => $this->module->l('Customer', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('Customer', [], 'Modules.Retractation2026.Admin'),
                 'filter_key' => 'c!lastname',
                 'havingFilter' => true,
             ],
             'status' => [
-                'title' => $this->module->l('Status', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('Status', [], 'Modules.Retractation2026.Admin'),
                 'type' => 'select',
                 'list' => $statusList,
                 'filter_key' => 'a!status',
                 'callback' => 'getStatusBadge',
             ],
             'retractation_date' => [
-                'title' => $this->module->l('Retractation date', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('Retractation date', [], 'Modules.Retractation2026.Admin'),
                 'type' => 'datetime',
                 'filter_key' => 'a!retractation_date',
             ],
             'deadline_date' => [
-                'title' => $this->module->l('Deadline', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('Deadline', [], 'Modules.Retractation2026.Admin'),
                 'type' => 'datetime',
                 'filter_key' => 'a!deadline_date',
             ],
             'deadline_source' => [
-                'title' => $this->module->l('Source', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('Source', [], 'Modules.Retractation2026.Admin'),
                 'filter_key' => 'a!deadline_source',
             ],
             'date_add' => [
-                'title' => $this->module->l('Created', 'AdminRetractationDashboardController'),
+                'title' => $this->trans('Created', [], 'Modules.Retractation2026.Admin'),
                 'type' => 'datetime',
                 'filter_key' => 'a!date_add',
             ],
@@ -98,7 +96,7 @@ class AdminRetractationDashboardController extends ModuleAdminController
 
         $row = Db::getInstance()->getRow($sql);
         if (!$row) {
-            $this->errors[] = $this->module->l('Retractation not found.', 'AdminRetractationDashboardController');
+            $this->errors[] = $this->trans('Retractation not found.', [], 'Modules.Retractation2026.Admin');
             return parent::renderList();
         }
 
@@ -110,48 +108,48 @@ class AdminRetractationDashboardController extends ModuleAdminController
                 . '<input type="hidden" name="id_retractation" value="' . $id . '" />'
                 . '<input type="hidden" name="statusretractation" value="1" />'
                 . '<input type="hidden" name="new_status" value="accepted" />'
-                . '<button type="submit" class="btn btn-success"><i class="icon-check"></i> ' . $this->module->l('Accept', 'AdminRetractationDashboardController') . '</button>'
+                . '<button type="submit" class="btn btn-success"><i class="icon-check"></i> ' . $this->trans('Accept', [], 'Modules.Retractation2026.Admin') . '</button>'
                 . '</form>';
             $statusActions .= '<form method="post" action="' . $baseUrl . '">'
                 . '<input type="hidden" name="id_retractation" value="' . $id . '" />'
                 . '<input type="hidden" name="statusretractation" value="1" />'
                 . '<input type="hidden" name="new_status" value="rejected" />'
                 . '<div class="form-group" style="margin-top:12px">'
-                . '<label><strong>' . $this->module->l('Rejection reason (required)', 'AdminRetractationDashboardController') . '</strong></label>'
-                . '<textarea name="reject_reason" class="form-control" rows="3" maxlength="1000" required placeholder="' . $this->module->l('Enter the reason for rejection...', 'AdminRetractationDashboardController') . '"></textarea>'
+                . '<label><strong>' . $this->trans('Rejection reason (required)', [], 'Modules.Retractation2026.Admin') . '</strong></label>'
+                . '<textarea name="reject_reason" class="form-control" rows="3" maxlength="1000" required placeholder="' . $this->trans('Enter the reason for rejection...', [], 'Modules.Retractation2026.Admin') . '"></textarea>'
                 . '</div>'
-                . '<button type="submit" class="btn btn-danger"><i class="icon-remove"></i> ' . $this->module->l('Reject', 'AdminRetractationDashboardController') . '</button>'
+                . '<button type="submit" class="btn btn-danger"><i class="icon-remove"></i> ' . $this->trans('Reject', [], 'Modules.Retractation2026.Admin') . '</button>'
                 . '</form>';
         }
 
         $html = '<div class="panel">';
-        $html .= '<div class="panel-heading"><i class="icon-eye"></i> ' . $this->module->l('Retractation', 'AdminRetractationDashboardController') . ' #' . $id . '</div>';
+        $html .= '<div class="panel-heading"><i class="icon-eye"></i> ' . $this->trans('Retractation', [], 'Modules.Retractation2026.Admin') . ' #' . $id . '</div>';
         $html .= '<div class="row">';
         $html .= '<div class="col-lg-6">';
         $html .= '<table class="table">';
         $orderLink = $this->context->link->getAdminLink('AdminOrders', true, [], ['id_order' => (int)$row['id_order'], 'vieworder' => 1]);
-        $html .= '<tr><td><strong>' . $this->module->l('Order', 'AdminRetractationDashboardController') . '</strong></td><td><a href="' . $orderLink . '">' . htmlspecialchars($row['order_reference'], ENT_QUOTES, 'UTF-8') . ' <i class="icon-external-link"></i></a></td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('Customer', 'AdminRetractationDashboardController') . '</strong></td><td>' . htmlspecialchars($row['customer_name'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('Email', 'AdminRetractationDashboardController') . '</strong></td><td>' . htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('Status', 'AdminRetractationDashboardController') . '</strong></td><td>' . $this->getStatusBadge($row['status']) . '</td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('Retractation date', 'AdminRetractationDashboardController') . '</strong></td><td>' . htmlspecialchars($row['retractation_date'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('Deadline', 'AdminRetractationDashboardController') . '</strong></td><td>' . htmlspecialchars($row['deadline_date'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('Source', 'AdminRetractationDashboardController') . '</strong></td><td>' . htmlspecialchars($row['deadline_source'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('IP', 'AdminRetractationDashboardController') . '</strong></td><td>' . htmlspecialchars($row['ip_address'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
-        $html .= '<tr><td><strong>' . $this->module->l('Created', 'AdminRetractationDashboardController') . '</strong></td><td>' . htmlspecialchars($row['date_add'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Order', [], 'Modules.Retractation2026.Admin') . '</strong></td><td><a href="' . $orderLink . '">' . htmlspecialchars($row['order_reference'], ENT_QUOTES, 'UTF-8') . ' <i class="icon-external-link"></i></a></td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Customer', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . htmlspecialchars($row['customer_name'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Email', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . htmlspecialchars($row['email'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Status', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . $this->getStatusBadge($row['status']) . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Retractation date', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . htmlspecialchars($row['retractation_date'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Deadline', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . htmlspecialchars($row['deadline_date'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Source', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . htmlspecialchars($row['deadline_source'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('IP', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . htmlspecialchars($row['ip_address'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
+        $html .= '<tr><td><strong>' . $this->trans('Created', [], 'Modules.Retractation2026.Admin') . '</strong></td><td>' . htmlspecialchars($row['date_add'], ENT_QUOTES, 'UTF-8') . '</td></tr>';
         $html .= '</table>';
         $html .= '</div>';
         $html .= '<div class="col-lg-6">';
-        $html .= '<div class="panel"><div class="panel-heading">' . $this->module->l('Customer reason', 'AdminRetractationDashboardController') . '</div>';
+        $html .= '<div class="panel"><div class="panel-heading">' . $this->trans('Customer reason', [], 'Modules.Retractation2026.Admin') . '</div>';
         $html .= '<p>' . nl2br(htmlspecialchars($row['reason'] ?? '', ENT_QUOTES, 'UTF-8')) . '</p>';
         $html .= '</div>';
         if ($row['status'] === 'rejected' && !empty($row['reject_reason'])) {
-            $html .= '<div class="panel panel-danger"><div class="panel-heading">' . $this->module->l('Rejection reason', 'AdminRetractationDashboardController') . '</div>';
+            $html .= '<div class="panel panel-danger"><div class="panel-heading">' . $this->trans('Rejection reason', [], 'Modules.Retractation2026.Admin') . '</div>';
             $html .= '<p>' . nl2br(htmlspecialchars($row['reject_reason'], ENT_QUOTES, 'UTF-8')) . '</p>';
             $html .= '</div>';
         }
         if ($statusActions) {
-            $html .= '<div class="panel"><div class="panel-heading">' . $this->module->l('Actions', 'AdminRetractationDashboardController') . '</div>';
+            $html .= '<div class="panel"><div class="panel-heading">' . $this->trans('Actions', [], 'Modules.Retractation2026.Admin') . '</div>';
             $html .= $statusActions;
             $html .= '</div>';
         }
@@ -160,7 +158,7 @@ class AdminRetractationDashboardController extends ModuleAdminController
         $html .= '</div>';
 
         $backUrl = $this->context->link->getAdminLink('AdminRetractationDashboard');
-        $html .= '<a href="' . $backUrl . '" class="btn btn-default"><i class="icon-arrow-left"></i> ' . $this->module->l('Back to list', 'AdminRetractationDashboardController') . '</a>';
+        $html .= '<a href="' . $backUrl . '" class="btn btn-default"><i class="icon-arrow-left"></i> ' . $this->trans('Back to list', [], 'Modules.Retractation2026.Admin') . '</a>';
 
         return $html;
     }
@@ -174,7 +172,7 @@ class AdminRetractationDashboardController extends ModuleAdminController
             $newStatus = pSQL(Tools::getValue('new_status'));
             $allowed = ['accepted', 'rejected', 'cancelled'];
             if (!in_array($newStatus, $allowed)) {
-                $this->errors[] = $this->module->l('Invalid status.', 'AdminRetractationDashboardController');
+                $this->errors[] = $this->trans('Invalid status.', [], 'Modules.Retractation2026.Admin');
                 return;
             }
 
@@ -182,7 +180,7 @@ class AdminRetractationDashboardController extends ModuleAdminController
             if ($newStatus === 'rejected') {
                 $rejectReason = strip_tags(trim(Tools::getValue('reject_reason', '')));
                 if (empty($rejectReason)) {
-                    $this->errors[] = $this->module->l('Please enter a rejection reason.', 'AdminRetractationDashboardController');
+                    $this->errors[] = $this->trans('Please enter a rejection reason.', [], 'Modules.Retractation2026.Admin');
                     return;
                 }
                 if (mb_strlen($rejectReason) > 1000) {
@@ -202,9 +200,9 @@ class AdminRetractationDashboardController extends ModuleAdminController
 
             if ($result) {
                 $this->sendStatusEmail($id, $newStatus);
-                $this->confirmations[] = $this->module->l('Status updated.', 'AdminRetractationDashboardController');
+                $this->confirmations[] = $this->trans('Status updated.', [], 'Modules.Retractation2026.Admin');
             } else {
-                $this->errors[] = $this->module->l('Could not update status.', 'AdminRetractationDashboardController');
+                $this->errors[] = $this->trans('Could not update status.', [], 'Modules.Retractation2026.Admin');
             }
             Tools::redirectAdmin($this->context->link->getAdminLink('AdminRetractationDashboard') . '&viewretractation&id_retractation=' . $id);
         }
@@ -214,7 +212,7 @@ class AdminRetractationDashboardController extends ModuleAdminController
     public function initPageHeaderToolbar()
     {
         parent::initPageHeaderToolbar();
-        $this->page_header_toolbar_title = $this->module->l('Retractation requests', 'AdminRetractationDashboardController');
+        $this->page_header_toolbar_title = $this->trans('Retractation requests', [], 'Modules.Retractation2026.Admin');
     }
 
     private function sendStatusEmail($idRetractation, $status)
@@ -252,8 +250,8 @@ class AdminRetractationDashboardController extends ModuleAdminController
 
         $template = 'retractation_' . $status;
         $subject = $status === 'accepted'
-            ? $this->module->l('Your retractation has been accepted', 'AdminRetractationDashboardController')
-            : $this->module->l('Your retractation has been rejected', 'AdminRetractationDashboardController');
+            ? $this->trans('Your retractation has been accepted', [], 'Modules.Retractation2026.Admin')
+            : $this->trans('Your retractation has been rejected', [], 'Modules.Retractation2026.Admin');
 
         // WR-01: removed @ suppression — failures now visible
         $sent = Mail::Send(
@@ -270,7 +268,7 @@ class AdminRetractationDashboardController extends ModuleAdminController
             _PS_MODULE_DIR_ . 'retractation2026/mails/'
         );
         if (!$sent) {
-            $this->warnings[] = $this->module->l('Email notification could not be sent.', 'AdminRetractationDashboardController');
+            $this->warnings[] = $this->trans('Email notification could not be sent.', [], 'Modules.Retractation2026.Admin');
         }
     }
 
@@ -283,10 +281,10 @@ class AdminRetractationDashboardController extends ModuleAdminController
             'cancelled' => 'badge-default',
         ];
         $labels = [
-            'pending' => $this->module->l('Pending', 'AdminRetractationDashboardController'),
-            'accepted' => $this->module->l('Accepted', 'AdminRetractationDashboardController'),
-            'rejected' => $this->module->l('Rejected', 'AdminRetractationDashboardController'),
-            'cancelled' => $this->module->l('Cancelled', 'AdminRetractationDashboardController'),
+            'pending' => $this->trans('Pending', [], 'Modules.Retractation2026.Admin'),
+            'accepted' => $this->trans('Accepted', [], 'Modules.Retractation2026.Admin'),
+            'rejected' => $this->trans('Rejected', [], 'Modules.Retractation2026.Admin'),
+            'cancelled' => $this->trans('Cancelled', [], 'Modules.Retractation2026.Admin'),
         ];
         $class = isset($badges[$value]) ? $badges[$value] : 'badge-info';
         $label = isset($labels[$value]) ? $labels[$value] : ucfirst($value);

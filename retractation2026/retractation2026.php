@@ -9,6 +9,8 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+require_once dirname(__FILE__) . '/autoload.php';
+
 class Retractation2026 extends Module
 {
     const CONFIG_KEYS = [
@@ -84,18 +86,11 @@ class Retractation2026 extends Module
 
         $this->installTranslations();
 
-        Configuration::updateValue('RETRACTATION_DELAY_DAYS', 14);
-        Configuration::updateValue('RETRACTATION_BUFFER_SHIPPED', 7);
-        Configuration::updateValue('RETRACTATION_BUFFER_ORDER', 14);
-        Configuration::updateValue('RETRACTATION_ENABLED', 1);
-        Configuration::updateValue('RETRACTATION_EMAIL_ENABLED', 1);
-        Configuration::updateValue('RETRACTATION_SHOW_PRODUCT_NOTICE', 1);
-        Configuration::updateValue('RETRACTATION_SHOW_CART_NOTICE', 1);
+        foreach (self::CONFIG_DEFAULTS as $key => $value) {
+            Configuration::updateValue($key, $value);
+        }
         Configuration::updateValue('RETRACTATION_PRODUCT_NOTICE_TEXT', '', true);
         Configuration::updateValue('RETRACTATION_CART_NOTICE_TEXT', '', true);
-        Configuration::updateValue('RETRACTATION_ADMIN_EMAIL_ENABLED', 1);
-        Configuration::updateValue('RETRACTATION_EXCLUDED_PRODUCTS', '');
-        Configuration::updateValue('RETRACTATION_EXCLUDED_CATEGORIES', '');
 
         $tab = new Tab();
         $tab->class_name = 'AdminRetractationDashboard';
@@ -106,17 +101,42 @@ class Retractation2026 extends Module
             $tab->name[$lang['id_lang']] = ($lang['iso_code'] === 'fr') ? 'Rétractations' : 'Retractations';
         }
         if (!$tab->add()) {
+            $this->cleanupInstall();
             return false;
         }
 
         $this->installMeta();
 
-        return parent::install()
+        $result = parent::install()
             && $this->registerHook('displayOrderDetail')
             && $this->registerHook('displayCustomerAccount')
             && $this->registerHook('displayAdminOrderSide')
             && $this->registerHook('displayProductAdditionalInfo')
             && $this->registerHook('displayShoppingCartFooter');
+
+        if (!$result) {
+            $this->cleanupInstall();
+            return false;
+        }
+
+        return true;
+    }
+
+    private function cleanupInstall()
+    {
+        Db::getInstance()->execute('DROP TABLE IF EXISTS `' . _DB_PREFIX_ . 'retractation`');
+
+        foreach (self::CONFIG_KEYS as $key) {
+            Configuration::deleteByName($key);
+        }
+
+        $idTab = (int) Tab::getIdFromClassName('AdminRetractationDashboard');
+        if ($idTab) {
+            $tab = new Tab($idTab);
+            $tab->delete();
+        }
+
+        $this->uninstallMeta();
     }
 
     private function installMeta()
@@ -212,8 +232,6 @@ class Retractation2026 extends Module
             return '';
         }
 
-        require_once dirname(__FILE__) . '/classes/RetractationEligibilityService.php';
-
         $service = new RetractationEligibilityService();
         $result = $service->getEligibility((int) $params['order']->id);
 
@@ -248,8 +266,6 @@ class Retractation2026 extends Module
         if ($idOrder <= 0) {
             return '';
         }
-
-        require_once dirname(__FILE__) . '/classes/RetractationEligibilityService.php';
 
         $service = new RetractationEligibilityService();
         $eligibility = $service->getEligibility($idOrder);
@@ -571,6 +587,21 @@ class Retractation2026 extends Module
         $admin = [
             'Rétractation 2026' => 'Rétractation 2026',
             'Settings updated.' => 'Paramètres enregistrés.',
+            'ID' => 'ID',
+            'Order' => 'Commande',
+            'Customer' => 'Client',
+            'Status' => 'Statut',
+            'Retractation date' => 'Date de rétractation',
+            'Deadline' => 'Date limite',
+            'Source' => 'Source',
+            'Created' => 'Créée le',
+            'Accept' => 'Accepter',
+            'Reject' => 'Refuser',
+            'Pending' => 'En attente',
+            'Accepted' => 'Acceptée',
+            'Rejected' => 'Refusée',
+            'Cancelled' => 'Annulée',
+            'Status updated.' => 'Statut mis à jour.',
             'Délai légal de rétractation (jours)' => 'Délai légal de rétractation (jours)',
             'Nombre de jours calendaires du délai légal (14 par défaut)' => 'Nombre de jours calendaires du délai légal (14 par défaut)',
             'Buffer expédition (jours)' => 'Buffer expédition (jours)',
@@ -644,6 +675,16 @@ class Retractation2026 extends Module
         $sql = str_replace('PREFIX_', _DB_PREFIX_, $sql);
         $sql = str_replace('ENGINE_TYPE', _MYSQL_ENGINE_, $sql);
 
-        return Db::getInstance()->execute($sql);
+        $statements = array_filter(array_map('trim', explode(';', $sql)));
+        foreach ($statements as $statement) {
+            if (empty($statement)) {
+                continue;
+            }
+            if (!Db::getInstance()->execute($statement)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

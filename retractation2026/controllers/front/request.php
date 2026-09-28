@@ -112,7 +112,6 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
     // WR-02: single eligibility + duplicate guard used by all code paths
     private function checkEligibility(Order $order): ?array
     {
-        require_once _PS_MODULE_DIR_ . 'retractation2026/classes/RetractationEligibilityService.php';
         $service = new RetractationEligibilityService();
         $eligibility = $service->getEligibility((int) $order->id);
 
@@ -193,7 +192,12 @@ class Retractation2026RequestModuleFrontController extends ModuleFrontController
 
         $inserted = Db::getInstance()->insert('retractation', $data);
         if (!$inserted) {
-            $this->errors[] = $this->trans('An error occurred while processing your request. Please try again.', [], 'Modules.Retractation2026.Front');
+            $dbError = Db::getInstance()->getMsgError();
+            if (stripos($dbError, 'Duplicate') !== false || stripos($dbError, '1062') !== false) {
+                $this->errors[] = $this->trans('A retractation request already exists for this order.', [], 'Modules.Retractation2026.Front');
+            } else {
+                $this->errors[] = $this->trans('An error occurred while processing your request. Please try again.', [], 'Modules.Retractation2026.Front');
+            }
             return;
         }
 
